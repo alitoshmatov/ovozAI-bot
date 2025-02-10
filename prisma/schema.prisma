@@ -25,6 +25,7 @@ model User {
   updatedAt         DateTime @updatedAt
   noLimit           Boolean  @default(false)
   audios            Audio[]
+  isUsingCyrillic   Boolean  @default(false)
 }
 
 model Audio {

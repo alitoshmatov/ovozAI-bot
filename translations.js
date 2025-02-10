@@ -15,6 +15,8 @@ export const translations = {
     error: "❌ Sorry, there was an error transcribing the voice message.",
     emptyMessage: "Audio does not contain any speech",
     fileTooLarge: "⚠️ The file is too large. Please send a shorter message.",
+    cyrillicEnabled: "✅ Now I will use cyrillic letters for uzbek text",
+    latinEnabled: "✅ Now I will use latin letters for uzbek text",
   },
   ru: {
     welcome:
@@ -35,11 +37,16 @@ export const translations = {
     emptyMessage: "Голосовое сообщение не содержит речи",
     fileTooLarge:
       "⚠️ Файл слишком большой. Пожалуйста, отправьте более короткое сообщение.",
+    cyrillicEnabled:
+      "✅ Теперь я буду использовать кириллицу для текста на узбекском.",
+    latinEnabled:
+      "✅ Теперь я буду использовать латиницу для текста на узбекском.",
   },
   uz: {
     welcome:
       "👋 Salom! Menga ovozli xabar yuboring va men uni matn ko'rinishida yozib beraman." +
       "\n\n/language buyrug'ini ishlatib tilni o'zgartirishingiz mumkin." +
+      "\n\n Kirillcha harflar ishlatish uchun /kirill buyrug'ini bosing." +
       "\n\n🔒 Sizning ma'lumotlaringiz saqlanmaydi va hech qanday maqsadda foydalanilmaydi.",
     error:
       "❌ Kechirasiz, botni ishga tushirishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
@@ -54,5 +61,11 @@ export const translations = {
     error: "❌ Xatolik yuz berdi. Ovozli xabarni o'qib bo'lmadi.",
     emptyMessage: "Ovozli xabarda so'zlashuv topilmadi",
     fileTooLarge: "⚠️ Fayl juda katta. Qisqa xabarni yuboring.",
+    cyrillicEnabled:
+      "✅ Endi men uzbekcha matn uchun kirill harflarini ishlataman." +
+      "\n\nLotin harflar ishlatish uchun /lotin buyrug'ini bosing.",
+    latinEnabled:
+      "✅ Endi men uzbekcha matn uchun lotin harflarini ishlataman." +
+      "\n\nKirill harflar ishlatish uchun /kirill buyrug'ini bosing.",
   },
 };

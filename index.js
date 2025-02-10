@@ -8,6 +8,12 @@ import { message } from "telegraf/filters";
 
 configDotenv();
 
+const commands = {
+  language: "language",
+  cyrillic: "kirill",
+  latin: "lotin",
+};
+
 const OWNER_ID = 495553408;
 
 const prisma = new PrismaClient();
@@ -36,11 +42,27 @@ const getLanguageKeyboard = () => {
   ]).resize();
 };
 
-bot.command("language", async (ctx) => {
+bot.command(commands.language, async (ctx) => {
   const user = await prisma.user.findUnique({
     where: { telegramId: ctx.from.id.toString() },
   });
   ctx.reply(getMessage(user, "selectLanguage"), getLanguageKeyboard());
+});
+
+bot.command(commands.cyrillic, async (ctx) => {
+  const user = await prisma.user.update({
+    where: { telegramId: ctx.from.id.toString() },
+    data: { isUsingCyrillic: true },
+  });
+  ctx.reply(getMessage(user, "cyrillicEnabled"));
+});
+
+bot.command(commands.latin, async (ctx) => {
+  const user = await prisma.user.update({
+    where: { telegramId: ctx.from.id.toString() },
+    data: { isUsingCyrillic: false },
+  });
+  ctx.reply(getMessage(user, "latinEnabled"));
 });
 
 // Handle language selection
@@ -133,7 +155,9 @@ bot.on(message("voice"), async (ctx) => {
           content: [
             {
               type: "text",
-              text: "You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'. If language is in uzbek use cyrillic letters.",
+              text: `You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'.${
+                user.isUsingCyrillic ? "Use cyrillic letters." : ""
+              }`,
             },
             {
               type: "file",
