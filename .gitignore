@@ -7,6 +7,7 @@ package-lock.json
 .env.local
 .env.*.local
 
+dev.db
 # Build output
 dist/
 build/

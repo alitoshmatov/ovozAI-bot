@@ -278,6 +278,11 @@ cron.schedule("0 16 * * *", getSummary);
 // Reset limits each month
 cron.schedule("0 0 1 * *", resetLimits);
 
+bot.catch((err, ctx) => {
+  console.error("Error in bot:", err);
+  notifyOwner(`Error in bot: ${err.message}`);
+});
+
 // Cleanup
 process.once("SIGINT", async () => {
   await prisma.$disconnect();
