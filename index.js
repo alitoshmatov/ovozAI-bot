@@ -4,6 +4,7 @@ import { configDotenv } from "dotenv";
 import { Telegraf, Markup } from "telegraf";
 import { PrismaClient } from "@prisma/client";
 import { translations } from "./translations.js";
+import { message } from "telegraf/filters";
 
 configDotenv();
 
@@ -88,17 +89,27 @@ bot.start(async (ctx) => {
       getLanguageKeyboard()
     );
   } catch (error) {
+    notifyOwner(
+      `Error starting bot: ${error.message}
+      User: \n\`${JSON.stringify(ctx.from)}\``
+    );
     ctx.reply(translations.en.error);
   }
 });
 
-bot.on("voice", async (ctx) => {
+bot.on(message("voice"), async (ctx) => {
+  const startTime = Date.now();
   // Show typing status
   await ctx.sendChatAction("typing");
 
   const voice = ctx.message.voice;
-  const telegramId = ctx.from.id.toString();
 
+  if (voice.duration > 60 * 20) {
+    ctx.reply(getMessage(user, "fileTooLarge"));
+    return;
+  }
+
+  const telegramId = ctx.from.id.toString();
   const file = await ctx.telegram.getFileLink(voice.file_id);
 
   const user = await prisma.user.update({
@@ -122,7 +133,7 @@ bot.on("voice", async (ctx) => {
           content: [
             {
               type: "text",
-              text: "You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'",
+              text: "You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'. If language is in uzbek use cyrillic letters.",
             },
             {
               type: "file",
@@ -134,6 +145,20 @@ bot.on("voice", async (ctx) => {
       ],
     });
 
+    // Request duration in seconds
+    const requestDuration = (Date.now() - startTime) / 1000;
+
+    prisma.audio
+      .create({
+        data: {
+          userId: user.id,
+          duration: voice.duration,
+          requestDuration,
+          isSuccess: true,
+        },
+      })
+      .then(() => {});
+
     ctx.reply(transcription.text, {
       parse_mode: "Markdown",
       reply_to_message_id: ctx.message.message_id,
@@ -141,7 +166,8 @@ bot.on("voice", async (ctx) => {
   } catch (error) {
     notifyOwner(
       `Error transcribing voice message: ${error.message}
-      User: \n\`${JSON.stringify(ctx.from)}\``
+      \nVoice: \n\`${JSON.stringify(ctx.message.voice)}\`
+      \nUser: \n\`${JSON.stringify(ctx.from)}\``
     );
     console.error("Error transcribing voice message:", error);
     ctx.reply(getMessage(user, "error"));

@@ -14,6 +14,7 @@ export const translations = {
     },
     error: "❌ Sorry, there was an error transcribing the voice message.",
     emptyMessage: "Audio does not contain any speech",
+    fileTooLarge: "⚠️ The file is too large. Please send a shorter message.",
   },
   ru: {
     welcome:
@@ -32,6 +33,8 @@ export const translations = {
     error:
       "❌ Извините, произошла ошибка при расшифровке голосового сообщения.",
     emptyMessage: "Голосовое сообщение не содержит речи",
+    fileTooLarge:
+      "⚠️ Файл слишком большой. Пожалуйста, отправьте более короткое сообщение.",
   },
   uz: {
     welcome:
@@ -50,5 +53,6 @@ export const translations = {
     },
     error: "❌ Xatolik yuz berdi. Ovozli xabarni o'qib bo'lmadi.",
     emptyMessage: "Ovozli xabarda so'zlashuv topilmadi",
+    fileTooLarge: "⚠️ Fayl juda katta. Qisqa xabarni yuboring.",
   },
 };

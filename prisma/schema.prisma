@@ -24,4 +24,16 @@ model User {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   noLimit           Boolean  @default(false)
+  audios            Audio[]
+}
+
+model Audio {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id])
+  duration        Float
+  requestDuration Float    @default(0)
+  isSuccess       Boolean
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
