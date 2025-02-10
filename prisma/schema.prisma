@@ -26,6 +26,7 @@ model User {
   noLimit           Boolean  @default(false)
   audios            Audio[]
   isUsingCyrillic   Boolean  @default(false)
+  referrerId        Int      @default(0)
 }
 
 model Audio {
