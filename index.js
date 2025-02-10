@@ -135,14 +135,16 @@ bot.on(message("voice"), async (ctx) => {
   const telegramId = ctx.from.id.toString();
   const file = await ctx.telegram.getFileLink(voice.file_id);
 
-  const user = await prisma.user.update({
+  const user = await prisma.user.findUnique({
     where: { telegramId },
-    data: { totalAudioSeconds: { increment: voice.duration } },
   });
 
   // Limit 1 hour
   if (user.totalAudioSeconds > 60 * 60 * 1 && !user.noLimit) {
     ctx.reply(getMessage(user, "limitReached"));
+    notifyOwner(
+      `User [${user.firstName}](tg://user?id=${user.telegramId}) reached the limit of 1 hour. Total audio seconds: ${user.totalAudioSeconds}`
+    );
     return;
   }
 
@@ -173,16 +175,20 @@ bot.on(message("voice"), async (ctx) => {
     // Request duration in seconds
     const requestDuration = (Date.now() - startTime) / 1000;
 
-    prisma.audio
-      .create({
+    Promise.all([
+      prisma.audio.create({
         data: {
           userId: user.id,
           duration: voice.duration,
           requestDuration,
           isSuccess: true,
         },
-      })
-      .then(() => {});
+      }),
+      prisma.user.update({
+        where: { telegramId },
+        data: { totalAudioSeconds: { increment: voice.duration } },
+      }),
+    ]).then(() => {});
 
     ctx.reply(transcription.text, {
       parse_mode: "Markdown",
@@ -254,7 +260,21 @@ const getSummary = async () => {
   }
 };
 
+const resetLimits = async () => {
+  try {
+    await prisma.user.updateMany({
+      data: { totalAudioSeconds: 0 },
+    });
+    notifyOwner("✅ Limits have been reset");
+  } catch (error) {
+    notifyOwner(`Error resetting limits: ${error.message}`);
+  }
+};
+
 cron.schedule("0 16 * * *", getSummary);
+
+// Reset limits each month
+cron.schedule("0 0 1 * *", resetLimits);
 
 // Cleanup
 process.once("SIGINT", async () => {
