@@ -5,6 +5,7 @@ import { Telegraf, Markup } from "telegraf";
 import { PrismaClient } from "@prisma/client";
 import { translations } from "./translations.js";
 import { message } from "telegraf/filters";
+import cron from "node-cron";
 
 configDotenv();
 
@@ -199,6 +200,61 @@ bot.on(message("voice"), async (ctx) => {
 });
 
 bot.launch();
+
+const getSummary = async () => {
+  try {
+    // Get today's date at midnight
+    const today = new Date();
+
+    // Get yesterday's date at midnight
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+
+    // Get new users who signed up yesterday
+    const newUsers = await prisma.user.count({
+      where: {
+        createdAt: {
+          gte: yesterday,
+          lt: today,
+        },
+      },
+    });
+
+    // Get audio transcriptions from yesterday
+    const audioStats = await prisma.audio.aggregate({
+      where: {
+        createdAt: {
+          gte: yesterday,
+          lt: today,
+        },
+        isSuccess: true,
+      },
+      _count: {
+        id: true,
+      },
+      _sum: {
+        duration: true,
+      },
+    });
+
+    // Format the duration in minutes and seconds
+    const totalAudioMinutes = Math.floor((audioStats._sum.duration || 0) / 60);
+    const totalAudioSeconds = (audioStats._sum.duration || 0) % 60;
+
+    const summaryMessage =
+      `📊 *Daily Summary Report*\n\n` +
+      `📅 Date: ${yesterday.toLocaleDateString()}\n` +
+      `👥 New Users: ${newUsers}\n` +
+      `🎤 Total Transcriptions: ${audioStats._count.id}\n` +
+      `⏱ Total Audio Length: ${totalAudioMinutes}m ${totalAudioSeconds}s`;
+
+    notifyOwner(summaryMessage);
+  } catch (error) {
+    console.error("Error generating daily summary:", error);
+    notifyOwner(`Error generating daily summary: ${error.message}`);
+  }
+};
+
+cron.schedule("0 16 * * *", getSummary);
 
 // Cleanup
 process.once("SIGINT", async () => {
