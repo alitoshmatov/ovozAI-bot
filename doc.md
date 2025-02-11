@@ -2,8 +2,9 @@
 
 # Changelog
 
-- 11.02.2025
+- 11.02.2025 - v1.1
   - Added referrer tracking
   - Added daily summary for admin
   - Added monthly limit reset
   - Added audio table for better stats
+  - Added cyrillic and latin commands

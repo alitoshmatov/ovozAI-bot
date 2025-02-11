@@ -113,6 +113,7 @@ bot.start(async (ctx) => {
       translations[user.language].selectLanguage,
       getLanguageKeyboard()
     );
+    notifyOwner(`New [u](tg://user?id=${user.telegramId})ser started the bot`);
   } catch (error) {
     notifyOwner(
       `Error starting bot: ${error.message}
@@ -152,8 +153,8 @@ bot.on(message("voice"), async (ctx) => {
 
   try {
     const transcription = await generateText({
-      model: google("gemini-2.0-flash"),
-
+      model: google("gemini-2.0-flash-001"),
+      maxRetries: 1,
       messages: [
         {
           role: "user",
