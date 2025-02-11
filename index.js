@@ -198,6 +198,20 @@ bot.on(message("voice"), async (ctx) => {
       reply_to_message_id: ctx.message.message_id,
     });
   } catch (error) {
+    const requestDuration = (Date.now() - startTime) / 1000;
+
+    prisma.audio
+      .create({
+        data: {
+          userId: user.id,
+          duration: voice.duration,
+          requestDuration,
+          isSuccess: false,
+        },
+      })
+      .then((res) => {
+        // console.log(res);
+      });
     notifyOwner(
       `Error transcribing voice message: ${error.message}
       \nVoice: \n\`${JSON.stringify(ctx.message.voice)}\`
