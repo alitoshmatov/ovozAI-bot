@@ -17,6 +17,8 @@ export const translations = {
     fileTooLarge: "⚠️ The file is too large. Please send a shorter message.",
     cyrillicEnabled: "✅ Now I will use cyrillic letters for uzbek text",
     latinEnabled: "✅ Now I will use latin letters for uzbek text",
+    fixedProblems:
+      "Sorry for the previous issues with transcribing your audio 🎙️. The problem has been fixed, and the bot is now fully functional ✅. You can use it again!",
   },
   ru: {
     welcome:
@@ -41,6 +43,8 @@ export const translations = {
       "✅ Теперь я буду использовать кириллицу для текста на узбекском.",
     latinEnabled:
       "✅ Теперь я буду использовать латиницу для текста на узбекском.",
+    fixedProblems:
+      "Ранее были проблемы с транскрипцией вашего аудио 🎙️. Ошибка исправлена, и бот снова полностью функционирует ✅. Вы можете использовать его снова!",
   },
   uz: {
     welcome:
@@ -67,5 +71,7 @@ export const translations = {
     latinEnabled:
       "✅ Endi men uzbekcha matn uchun lotin harflarini ishlataman." +
       "\n\nKirill harflar ishlatish uchun /kirill buyrug'ini bosing.",
+    fixedProblems:
+      "Oldinroq ko'zatilgan xatoliklar bartaraf etildi 🎙️. Bot yana to'liq ish holatiga qaytdi ✅. Qayta foydalanishingiz mumkin!",
   },
 };

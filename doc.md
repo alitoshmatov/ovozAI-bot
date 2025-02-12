@@ -1,5 +1,7 @@
 # TODO
 
+- Support for groups
+
 # Changelog
 
 - 11.02.2025 - v1.1
