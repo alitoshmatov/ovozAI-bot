@@ -1,13 +1,15 @@
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { generateText } from "ai";
+// import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { configDotenv } from "dotenv";
+configDotenv();
+
+import { generateText } from "ai";
 import { Telegraf, Markup } from "telegraf";
 import { PrismaClient } from "@prisma/client";
 import { translations } from "./translations.js";
 import { message } from "telegraf/filters";
 import cron from "node-cron";
-
-configDotenv();
+import { vertex } from "@ai-sdk/google-vertex";
+import axios from "axios";
 
 const commands = {
   language: "language",
@@ -18,9 +20,9 @@ const commands = {
 const OWNER_ID = 495553408;
 
 const prisma = new PrismaClient();
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GOOGLE_API_KEY,
-});
+// const google = createGoogleGenerativeAI({
+//   apiKey: process.env.GOOGLE_API_KEY,
+// });
 
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
@@ -136,7 +138,7 @@ bot.on(message("voice"), async (ctx) => {
   }
 
   const telegramId = ctx.from.id.toString();
-  const file = await ctx.telegram.getFileLink(voice.file_id);
+  const fileLink = await ctx.telegram.getFileLink(voice.file_id);
 
   const user = await prisma.user.findUnique({
     where: { telegramId },
@@ -152,8 +154,14 @@ bot.on(message("voice"), async (ctx) => {
   }
 
   try {
+    // Download the file
+    const response = await axios.get(fileLink.href, {
+      responseType: "arraybuffer",
+    });
+    const audioData = Buffer.from(response.data);
+
     const transcription = await generateText({
-      model: google("gemini-2.0-flash-001"),
+      model: vertex("gemini-2.0-flash"),
       maxRetries: 1,
       messages: [
         {
@@ -167,7 +175,7 @@ bot.on(message("voice"), async (ctx) => {
             },
             {
               type: "file",
-              data: file.href,
+              data: audioData,
               mimeType: "audio/ogg",
             },
           ],

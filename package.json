@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^1.1.10",
+    "@ai-sdk/google-vertex": "^2.1.12",
+    "@ai-sdk/openai": "^1.1.9",
     "@prisma/client": "^6.3.1",
     "ai": "^4.1.24",
     "axios": "^1.7.9",
