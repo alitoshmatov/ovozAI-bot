@@ -19,6 +19,9 @@ export const translations = {
     latinEnabled: "✅ Now I will use latin letters for uzbek text",
     fixedProblems:
       "Sorry for the previous issues with transcribing your audio 🎙️. The problem has been fixed, and the bot is now fully functional ✅. You can use it again!",
+    shareToSupport: "Share the bot with others to support our project!",
+    shareBot: "Share the bot 🚀",
+    shareBotText: "Try it out! A bot that transcribes voice messages to text.",
   },
   ru: {
     welcome:
@@ -45,6 +48,10 @@ export const translations = {
       "✅ Теперь я буду использовать латиницу для текста на узбекском.",
     fixedProblems:
       "Ранее были проблемы с транскрипцией вашего аудио 🎙️. Ошибка исправлена, и бот снова полностью функционирует ✅. Вы можете использовать его снова!",
+    shareToSupport: "Поделитесь ботом с другими, чтобы поддержать наш проект!",
+    shareBot: "Поделиться ботом 🚀",
+    shareBotText:
+      "Попробуйте! Бот, который транскрибирует голосовые сообщения в текст.",
   },
   uz: {
     welcome:
@@ -73,5 +80,9 @@ export const translations = {
       "\n\nKirill harflar ishlatish uchun /kirill buyrug'ini bosing.",
     fixedProblems:
       "Oldinroq ko'zatilgan xatoliklar bartaraf etildi 🎙️. Bot yana to'liq ish holatiga qaytdi ✅. Qayta foydalanishingiz mumkin!",
+    shareToSupport:
+      "Loyihamizni qo‘llab-quvvatlash uchun boshqalar bilan ulashing!",
+    shareBot: "Botni yuborish 🚀",
+    shareBotText: "Ishlatib ko'ring! Ovozli xabarni matnga o'giradigan bot.",
   },
 };

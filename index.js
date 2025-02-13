@@ -142,6 +142,25 @@ bot.on(message("voice"), async (ctx) => {
 
   const user = await prisma.user.findUnique({
     where: { telegramId },
+    select: {
+      firstName: true,
+      language: true,
+      totalAudioSeconds: true,
+      noLimit: true,
+      isUsingCyrillic: true,
+      referrerId: true,
+      id: true,
+      telegramId: true,
+      _count: {
+        select: {
+          audios: {
+            where: {
+              isSuccess: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   // Limit 1 hour
@@ -201,10 +220,32 @@ bot.on(message("voice"), async (ctx) => {
       }),
     ]).then(() => {});
 
-    ctx.reply(transcription.text, {
-      parse_mode: "Markdown",
-      reply_to_message_id: ctx.message.message_id,
-    });
+    const shouldShare = user?._count?.audios % 5 === 0;
+
+    ctx.reply(
+      `${transcription.text}
+${
+  shouldShare
+    ? `\n<blockquote>${translations[user.language].shareToSupport}</blockquote>`
+    : ""
+}`,
+      {
+        parse_mode: "HTML",
+        reply_to_message_id: ctx.message.message_id,
+        reply_markup: shouldShare
+          ? Markup.inlineKeyboard([
+              [
+                Markup.button.url(
+                  translations[user.language].shareBot,
+                  `https://t.me/share/url?url=https://t.me/ovozliaibot?start=${
+                    user.telegramId
+                  }&text=\n\n${translations[user.language].shareBotText}`
+                ),
+              ],
+            ]).reply_markup
+          : null,
+      }
+    );
   } catch (error) {
     const requestDuration = (Date.now() - startTime) / 1000;
 
