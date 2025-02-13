@@ -27,6 +27,8 @@ model User {
   audios            Audio[]
   isUsingCyrillic   Boolean  @default(false)
   referrerId        Int      @default(0)
+  textMessageCount  Int      @default(0)
+  textMessageTokens Int      @default(0)
 }
 
 model Audio {

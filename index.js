@@ -10,6 +10,7 @@ import { message } from "telegraf/filters";
 import cron from "node-cron";
 import { vertex } from "@ai-sdk/google-vertex";
 import axios from "axios";
+import { TEXT_PROMPT } from "./config.js";
 
 const commands = {
   language: "language",
@@ -220,7 +221,8 @@ bot.on(message("voice"), async (ctx) => {
       }),
     ]).then(() => {});
 
-    const shouldShare = user?._count?.audios % 5 === 0;
+    const shouldShare =
+      user?._count?.audios !== 0 && (user?._count?.audios + 1) % 5 === 0;
 
     ctx.reply(
       `${transcription.text}
@@ -269,6 +271,45 @@ ${
     console.error("Error transcribing voice message:", error);
     ctx.reply(getMessage(user, "error"));
   }
+});
+
+bot.on(message("text"), async (ctx) => {
+  const user = await prisma.user.findUnique({
+    where: { telegramId: ctx.from.id.toString() },
+  });
+
+  if (user.textMessageTokens >= 1000000) {
+    ctx.reply("Token limit reached");
+    notifyOwner(
+      `User [${user.firstName}](tg://user?id=${user.telegramId}) reached the limit of 1 million tokens. Text message tokens: ${user.textMessageTokens}`
+    );
+    return;
+  }
+
+  const answer = await generateText({
+    model: vertex("gemini-2.0-flash"),
+    maxRetries: 1,
+    messages: [
+      {
+        role: "system",
+        content: TEXT_PROMPT(user.language),
+      },
+      {
+        role: "user",
+        content: ctx.message.text,
+      },
+    ],
+  });
+  prisma.user
+    .update({
+      where: { telegramId: ctx.from.id.toString() },
+      data: {
+        textMessageCount: { increment: 1 },
+        textMessageTokens: { increment: answer.usage.totalTokens },
+      },
+    })
+    .then((res) => {});
+  ctx.reply(answer.text);
 });
 
 bot.launch();
