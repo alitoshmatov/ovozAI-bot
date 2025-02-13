@@ -10,7 +10,7 @@ import { message } from "telegraf/filters";
 import cron from "node-cron";
 import { vertex } from "@ai-sdk/google-vertex";
 import axios from "axios";
-import { TEXT_PROMPT } from "./config.js";
+import { BOT_USERNAME, TEXT_PROMPT } from "./config.js";
 
 const commands = {
   language: "language",
@@ -274,6 +274,16 @@ ${
 });
 
 bot.on(message("text"), async (ctx) => {
+  // Do not answer if group, only answer when mentioned
+  const isMentioned = ctx.message.text.includes(`@${BOT_USERNAME}`);
+
+  if (
+    (ctx.chat.type === "group" || ctx.chat.type === "supergroup") &&
+    !isMentioned
+  ) {
+    return;
+  }
+
   const user = await prisma.user.findUnique({
     where: { telegramId: ctx.from.id.toString() },
   });
@@ -309,7 +319,9 @@ bot.on(message("text"), async (ctx) => {
       },
     })
     .then((res) => {});
-  ctx.reply(answer.text);
+  ctx.reply(answer.text, {
+    reply_to_message_id: isMentioned ? ctx.message.message_id : undefined,
+  });
 });
 
 bot.launch();
