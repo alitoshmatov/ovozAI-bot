@@ -118,7 +118,11 @@ bot.start(async (ctx) => {
       translations[user.language].selectLanguage,
       getLanguageKeyboard()
     );
-    notifyOwner(`New [u](tg://user?id=${user.telegramId})ser started the bot`);
+    notifyOwner(
+      `New [user](tg://user?id=${telegramId}) started the bot referrer ${
+        referrerId ? `[user](tg://user?id=${referrerId})` : "none"
+      }`
+    );
   } catch (error) {
     notifyOwner(
       `Error starting bot: ${error.message}
