@@ -10,7 +10,9 @@ import { message } from "telegraf/filters";
 import cron from "node-cron";
 import { vertex } from "@ai-sdk/google-vertex";
 import axios from "axios";
-import { BOT_USERNAME, TEXT_PROMPT } from "./config.js";
+import { TEXT_PROMPT } from "./config.js";
+
+const BOT_USERNAME = process.env.BOT_USERNAME;
 
 const commands = {
   language: "language",
@@ -239,7 +241,7 @@ ${
               [
                 Markup.button.url(
                   translations[user.language].shareBot,
-                  `https://t.me/share/url?url=https://t.me/ovozliaibot?start=${
+                  `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=${
                     user.telegramId
                   }&text=\n\n${translations[user.language].shareBotText}`
                 ),
