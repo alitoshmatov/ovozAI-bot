@@ -48,47 +48,84 @@ const getLanguageKeyboard = () => {
   ]).resize();
 };
 
+// Helper function to safely send messages
+const safeSendMessage = async (ctx, text, options = {}) => {
+  try {
+    return await ctx.reply(text, options);
+  } catch (error) {
+    if (error.response?.error_code === 403) {
+      console.log(`User ${ctx.from?.id} has blocked the bot`);
+      return null;
+    }
+    throw error;
+  }
+};
+
 bot.command(commands.language, async (ctx) => {
-  const user = await prisma.user.findUnique({
-    where: { telegramId: ctx.from.id.toString() },
-  });
-  ctx.reply(getMessage(user, "selectLanguage"), getLanguageKeyboard());
+  try {
+    const user = await prisma.user.findUnique({
+      where: { telegramId: ctx.from.id.toString() },
+    });
+    await safeSendMessage(
+      ctx,
+      getMessage(user, "selectLanguage"),
+      getLanguageKeyboard()
+    );
+  } catch (error) {
+    console.error(`Error in language command: ${error.message}`);
+  }
 });
 
 bot.command(commands.cyrillic, async (ctx) => {
-  const user = await prisma.user.update({
-    where: { telegramId: ctx.from.id.toString() },
-    data: { isUsingCyrillic: true },
-  });
-  ctx.reply(getMessage(user, "cyrillicEnabled"));
+  try {
+    const user = await prisma.user.update({
+      where: { telegramId: ctx.from.id.toString() },
+      data: { isUsingCyrillic: true },
+    });
+    await safeSendMessage(ctx, getMessage(user, "cyrillicEnabled"));
+  } catch (error) {
+    console.error(`Error in cyrillic command: ${error.message}`);
+  }
 });
 
 bot.command(commands.latin, async (ctx) => {
-  const user = await prisma.user.update({
-    where: { telegramId: ctx.from.id.toString() },
-    data: { isUsingCyrillic: false },
-  });
-  ctx.reply(getMessage(user, "latinEnabled"));
+  try {
+    const user = await prisma.user.update({
+      where: { telegramId: ctx.from.id.toString() },
+      data: { isUsingCyrillic: false },
+    });
+    await safeSendMessage(ctx, getMessage(user, "latinEnabled"));
+  } catch (error) {
+    console.error(`Error in latin command: ${error.message}`);
+  }
 });
 
 // Handle language selection
 bot.hears(["English 🇬🇧", "Русский 🇷🇺", "O'zbek 🇺🇿"], async (ctx) => {
-  const languageMap = {
-    "English 🇬🇧": "en",
-    "Русский 🇷🇺": "ru",
-    "O'zbek 🇺🇿": "uz",
-  };
+  try {
+    const languageMap = {
+      "English 🇬🇧": "en",
+      "Русский 🇷🇺": "ru",
+      "O'zbek 🇺🇿": "uz",
+    };
 
-  const language = languageMap[ctx.message.text];
-  const telegramId = ctx.from.id.toString();
+    const language = languageMap[ctx.message.text];
+    const telegramId = ctx.from.id.toString();
 
-  const user = await prisma.user.update({
-    where: { telegramId },
-    data: { language },
-  });
+    const user = await prisma.user.update({
+      where: { telegramId },
+      data: { language },
+    });
 
-  await ctx.reply(getMessage(user, "languageSet"), Markup.removeKeyboard());
-  await ctx.reply(getMessage(user, "welcome"));
+    await safeSendMessage(
+      ctx,
+      getMessage(user, "languageSet"),
+      Markup.removeKeyboard()
+    );
+    await safeSendMessage(ctx, getMessage(user, "welcome"));
+  } catch (error) {
+    console.error(`Error in language selection: ${error.message}`);
+  }
 });
 
 bot.start(async (ctx) => {
@@ -104,7 +141,7 @@ bot.start(async (ctx) => {
         firstName: ctx.from.first_name,
         lastName: ctx.from.last_name,
         username: ctx.from.username,
-        referrerId: referrerId, // Store the referrer ID
+        // referrerId: referrerId, // Store the referrer ID
       },
       update: {
         firstName: ctx.from.first_name,
@@ -114,8 +151,9 @@ bot.start(async (ctx) => {
     });
 
     // Show language selection on start
-    await ctx.reply(
-      translations[user.language].selectLanguage,
+    await safeSendMessage(
+      ctx,
+      getMessage(user, "selectLanguage"),
       getLanguageKeyboard()
     );
     notifyOwner(
@@ -128,7 +166,7 @@ bot.start(async (ctx) => {
       `Error starting bot: ${error.message}
       User: \n\`${JSON.stringify(ctx.from)}\``
     );
-    ctx.reply(translations.en.error);
+    ctx.reply(getMessage(user, "error"));
   }
 });
 
@@ -402,7 +440,7 @@ cron.schedule("0 16 * * *", getSummary);
 cron.schedule("0 0 1 * *", resetLimits);
 
 bot.catch((err, ctx) => {
-  console.error("Error in bot:", err);
+  // console.error("Error in bot:", err);
   notifyOwner(`Error in bot: ${err.message}`);
 });
 
