@@ -16,8 +16,6 @@ const BOT_USERNAME = process.env.BOT_USERNAME;
 
 const commands = {
   language: "language",
-  cyrillic: "kirill",
-  latin: "lotin",
 };
 
 const OWNER_ID = 495553408;
@@ -42,7 +40,7 @@ const getMessage = (user, key) => {
 // Create language selection keyboard
 const getLanguageKeyboard = () => {
   return Markup.keyboard([
-    ["O'zbek 🇺🇿"],
+    ["O'zbek 🇺🇿", "Ўзбек 🇺🇿"],
     ["Русский 🇷🇺"],
     ["English 🇬🇧"],
   ]).resize();
@@ -76,62 +74,42 @@ bot.command(commands.language, async (ctx) => {
   }
 });
 
-bot.command(commands.cyrillic, async (ctx) => {
-  try {
-    const user = await prisma.user.update({
-      where: { telegramId: ctx.from.id.toString() },
-      data: { isUsingCyrillic: true },
-    });
-    await safeSendMessage(ctx, getMessage(user, "cyrillicEnabled"));
-  } catch (error) {
-    console.error(`Error in cyrillic command: ${error.message}`);
-  }
-});
-
-bot.command(commands.latin, async (ctx) => {
-  try {
-    const user = await prisma.user.update({
-      where: { telegramId: ctx.from.id.toString() },
-      data: { isUsingCyrillic: false },
-    });
-    await safeSendMessage(ctx, getMessage(user, "latinEnabled"));
-  } catch (error) {
-    console.error(`Error in latin command: ${error.message}`);
-  }
-});
-
 // Handle language selection
-bot.hears(["English 🇬🇧", "Русский 🇷🇺", "O'zbek 🇺🇿"], async (ctx) => {
-  try {
-    const languageMap = {
-      "English 🇬🇧": "en",
-      "Русский 🇷🇺": "ru",
-      "O'zbek 🇺🇿": "uz",
-    };
+bot.hears(
+  ["English 🇬🇧", "Русский 🇷🇺", "O'zbek 🇺🇿", "Ўзбек 🇺🇿"],
+  async (ctx) => {
+    try {
+      const languageMap = {
+        "English 🇬🇧": "en",
+        "Русский 🇷🇺": "ru",
+        "O'zbek 🇺🇿": "uz",
+        "Ўзбек 🇺🇿": "uz_cyrillic",
+      };
 
-    const language = languageMap[ctx.message.text];
-    const telegramId = ctx.from.id.toString();
+      const language = languageMap[ctx.message.text];
+      const telegramId = ctx.from.id.toString();
 
-    const user = await prisma.user.update({
-      where: { telegramId },
-      data: { language },
-    });
+      const user = await prisma.user.update({
+        where: { telegramId },
+        data: { language },
+      });
 
-    await safeSendMessage(
-      ctx,
-      getMessage(user, "languageSet"),
-      Markup.removeKeyboard()
-    );
-    await safeSendMessage(ctx, getMessage(user, "welcome"));
-  } catch (error) {
-    console.error(`Error in language selection: ${error.message}`);
+      await safeSendMessage(
+        ctx,
+        getMessage(user, "languageSet"),
+        Markup.removeKeyboard()
+      );
+      await safeSendMessage(ctx, getMessage(user, "welcome"));
+    } catch (error) {
+      console.error(`Error in language selection: ${error.message}`);
+    }
   }
-});
+);
 
 bot.start(async (ctx) => {
   try {
     const telegramId = ctx.from.id.toString();
-    const referrerId = parseInt(ctx.payload) || 0; // Convert to number or default to 0
+    const referrerId = ctx.payload;
 
     // Create or update user
     const user = await prisma.user.upsert({
@@ -141,7 +119,7 @@ bot.start(async (ctx) => {
         firstName: ctx.from.first_name,
         lastName: ctx.from.last_name,
         username: ctx.from.username,
-        // referrerId: referrerId, // Store the referrer ID
+        referrerId: referrerId || "", // Store the referrer ID
       },
       update: {
         firstName: ctx.from.first_name,
@@ -192,7 +170,6 @@ bot.on(message("voice"), async (ctx) => {
       language: true,
       totalAudioSeconds: true,
       noLimit: true,
-      isUsingCyrillic: true,
       referrerId: true,
       id: true,
       telegramId: true,
@@ -234,7 +211,7 @@ bot.on(message("voice"), async (ctx) => {
             {
               type: "text",
               text: `You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'.${
-                user.isUsingCyrillic ? "Use cyrillic letters." : ""
+                user.language === "uz_cyrillic" ? "Use cyrillic letters." : ""
               }`,
             },
             {

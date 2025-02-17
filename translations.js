@@ -57,7 +57,6 @@ export const translations = {
     welcome:
       "👋 Salom! Menga ovozli xabar yuboring va men uni matn ko'rinishida yozib beraman." +
       "\n\n/language buyrug'ini ishlatib tilni o'zgartirishingiz mumkin." +
-      "\n\n Kirillcha harflar ishlatish uchun /kirill buyrug'ini bosing." +
       "\n\n🔒 Sizning ma'lumotlaringiz saqlanmaydi va hech qanday maqsadda foydalanilmaydi.",
     error:
       "❌ Kechirasiz, botni ishga tushirishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
@@ -72,17 +71,36 @@ export const translations = {
     error: "❌ Xatolik yuz berdi. Ovozli xabarni o'qib bo'lmadi.",
     emptyMessage: "Ovozli xabarda so'zlashuv topilmadi",
     fileTooLarge: "⚠️ Fayl juda katta. Qisqa xabarni yuboring.",
-    cyrillicEnabled:
-      "✅ Endi men uzbekcha matn uchun kirill harflarini ishlataman." +
-      "\n\nLotin harflar ishlatish uchun /lotin buyrug'ini bosing.",
-    latinEnabled:
-      "✅ Endi men uzbekcha matn uchun lotin harflarini ishlataman." +
-      "\n\nKirill harflar ishlatish uchun /kirill buyrug'ini bosing.",
     fixedProblems:
       "Oldinroq ko'zatilgan xatoliklar bartaraf etildi 🎙️. Bot yana to'liq ish holatiga qaytdi ✅. Qayta foydalanishingiz mumkin!",
     shareToSupport:
-      "Loyihamizni qo‘llab-quvvatlash uchun boshqalar bilan ulashing!",
+      "Loyihamizni qo'llab-quvvatlash uchun boshqalar bilan ulashing!",
     shareBot: "Botni yuborish 🚀",
     shareBotText: "Ishlatib ko'ring! Ovozli xabarni matnga o'giradigan bot.",
+  },
+  uz_cyrillic: {
+    welcome:
+      "👋 Салом! Менга овозли хабар юборинг ва мен уни матн кўринишида ёзиб бераман." +
+      "\n\n/language буйруғини ишлатиб тилни ўзгартиришингиз мумкин." +
+      "\n\n🔒 Сизнинг маълумотларингиз сақланмайди ва ҳеч қандай мақсадда фойдаланилмайди.",
+    error:
+      "❌ Кечирасиз, ботни ишга туширишда хатолик юз берди. Илтимос, қайта уриниб кўринг.",
+    limitReached: "⚠️ Сиз 1 соатлик максимал лимитга етдингиз.",
+    languageSet: "✅ Тил ўзбек тилига ўзгартирилди.",
+    selectLanguage: "Илтимос, тилни танланг:",
+    languages: {
+      uz: "Ўзбек 🇺🇿",
+      ru: "Русский 🇷🇺",
+      en: "English 🇬🇧",
+    },
+    error: "❌ Хатолик юз берди. Овозли хабарни ўқиб бўлмади.",
+    emptyMessage: "Овозли хабарда сўзлашув топилмади",
+    fileTooLarge: "⚠️ Файл жуда катта. Қисқа хабарни юборинг.",
+
+    fixedProblems:
+      "Олдинроқ кўзатилган хатоликлар бартараф этилди 🎙️. Бот яна тўлиқ иш ҳолатига қайтди ✅. Қайта фойдаланишингиз мумкин!",
+    shareToSupport: "Лойиҳамизни қўллаб-қувватлаш учун бошқалар билан улашинг!",
+    shareBot: "Ботни юбориш 🚀",
+    shareBotText: "Ишлатиб кўринг! Овозли хабарни матнга ўгирадиган бот.",
   },
 };

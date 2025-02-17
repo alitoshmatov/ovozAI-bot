@@ -19,14 +19,14 @@ model User {
   firstName         String?
   lastName          String?
   username          String?
-  language          String   @default("en") // User's preferred language (en, ru, uz)
+  language          String   @default("en") // User's preferred language (en, ru, uz, uz_cyrillic)
   totalAudioSeconds Float    @default(0) // Total duration of processed audio in seconds
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   noLimit           Boolean  @default(false)
   audios            Audio[]
   isUsingCyrillic   Boolean  @default(false)
-  referrerId        BigInt   @default(0)
+  referrerId        String   @default("")
   textMessageCount  Int      @default(0)
   textMessageTokens Int      @default(0)
 }
