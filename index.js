@@ -176,17 +176,29 @@ bot.hears(
       const language = languageMap[ctx.message.text];
       const telegramId = ctx.from.id.toString();
 
-      const user = await prisma.user.update({
-        where: { telegramId },
-        data: { language },
-      });
+      if (isGroup(ctx)) {
+        const group = await prisma.group.update({
+          where: { telegramId: ctx.chat.id.toString() },
+          data: { language },
+        });
+        await safeSendMessage(
+          ctx,
+          getMessage(group, "languageSet"),
+          Markup.removeKeyboard()
+        );
+      } else {
+        const user = await prisma.user.update({
+          where: { telegramId },
+          data: { language },
+        });
 
-      await safeSendMessage(
-        ctx,
-        getMessage(user, "languageSet"),
-        Markup.removeKeyboard()
-      );
-      await safeSendMessage(ctx, getMessage(user, "welcome"));
+        await safeSendMessage(
+          ctx,
+          getMessage(user, "languageSet"),
+          Markup.removeKeyboard()
+        );
+        await safeSendMessage(ctx, getMessage(user, "welcome"));
+      }
     } catch (error) {
       console.error(`Error in language selection: ${error.message}`);
     }
@@ -222,7 +234,7 @@ bot.start(async (ctx) => {
       getLanguageKeyboard()
     );
     notifyOwner(
-      `New [user](tg://user?id=${telegramId}) started the bot referrer ${
+      `New [user](tg://user?id=${telegramId}) (${telegramId}) started the bot referrer ${
         referrerId ? `[user](tg://user?id=${referrerId})` : "none"
       }`
     );
@@ -274,13 +286,37 @@ bot.on(message("voice"), async (ctx) => {
     },
   });
 
-  // Limit 1 hour
-  if (user.totalAudioSeconds > 60 * 60 * 1 && !user.noLimit) {
-    ctx.reply(getMessage(user, "limitReached"));
-    notifyOwner(
-      `User [${user.firstName}](tg://user?id=${user.telegramId}) reached the limit of 1 hour. Total audio seconds: ${user.totalAudioSeconds}`
-    );
-    return;
+  const group = await prisma.group.findUnique({
+    where: { telegramId: ctx.chat.id.toString() },
+  });
+
+  if (!isGroup(ctx)) {
+    // Limit 1 hour
+    if (user.totalAudioSeconds > 60 * 60 * 1 && !user.noLimit) {
+      ctx.reply(getMessage(user, "limitReached"));
+      notifyOwner(
+        `User [${user.firstName}](tg://user?id=${user.telegramId}) reached the limit of 1 hour. Total audio seconds: ${user.totalAudioSeconds}`
+      );
+      return;
+    }
+  } else {
+    if (!group) {
+      await prisma.group.create({
+        data: {
+          telegramId: ctx.chat.id.toString(),
+          title: ctx.chat.title,
+          isKicked: false,
+        },
+      });
+    } else {
+      if (group.totalAudioSeconds > 60 * 60 * 1) {
+        ctx.reply(getMessage(group, "limitReached"));
+        notifyOwner(
+          `Group [${group.title}](tg://user?id=${group.telegramId}) reached the limit of 1 hour. Total audio seconds: ${group.totalAudioSeconds}`
+        );
+        return;
+      }
+    }
   }
 
   try {
@@ -323,12 +359,18 @@ bot.on(message("voice"), async (ctx) => {
           duration: voice.duration,
           requestDuration,
           isSuccess: true,
+          groupId: isGroup(ctx) ? group.id : null,
         },
       }),
-      prisma.user.update({
-        where: { telegramId },
-        data: { totalAudioSeconds: { increment: voice.duration } },
-      }),
+      isGroup(ctx)
+        ? prisma.group.update({
+            where: { telegramId: ctx.chat.id.toString() },
+            data: { totalAudioSeconds: { increment: voice.duration } },
+          })
+        : prisma.user.update({
+            where: { telegramId },
+            data: { totalAudioSeconds: { increment: voice.duration } },
+          }),
     ]).then(() => {});
 
     const shouldShare =
@@ -368,6 +410,7 @@ ${
           duration: voice.duration,
           requestDuration,
           isSuccess: false,
+          groupId: isGroup(ctx) ? group.id : null,
         },
       })
       .then((res) => {
