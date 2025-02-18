@@ -20,6 +20,7 @@ prisma.user
   .findMany()
   .then((res) => {
     res.forEach(async (user) => {
+      console.log("Sending");
       await bot.telegram.sendMessage(user.telegramId, message[user.language]);
       console.log(
         `Sent to ${user.username} ${user.firstName} ${user.lastName} (${user.telegramId})`
