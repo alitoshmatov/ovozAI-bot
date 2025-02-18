@@ -22,6 +22,8 @@ export const translations = {
     shareToSupport: "Share the bot with others to support our project!",
     shareBot: "Share the bot 🚀",
     shareBotText: "Try it out! A bot that transcribes voice messages to text.",
+    addedToGroup: "Make me an admin to listen to voice messages.",
+    promotedToAdmin: "✅ I can now transcribe voice messages to text.",
   },
   ru: {
     welcome:
@@ -52,6 +54,10 @@ export const translations = {
     shareBot: "Поделиться ботом 🚀",
     shareBotText:
       "Попробуйте! Бот, который транскрибирует голосовые сообщения в текст.",
+    addedToGroup:
+      "Сделайте меня администратором, чтобы прослушивать голосовые сообщения.",
+    promotedToAdmin:
+      "✅ Я могу теперь транскрибировать голосовые сообщения в текст.",
   },
   uz: {
     welcome:
@@ -77,6 +83,8 @@ export const translations = {
       "Loyihamizni qo'llab-quvvatlash uchun boshqalar bilan ulashing!",
     shareBot: "Botni yuborish 🚀",
     shareBotText: "Ishlatib ko'ring! Ovozli xabarni matnga o'giradigan bot.",
+    addedToGroup: "Ovozli xabarlarni eshitishim uchun admin qiling.",
+    promotedToAdmin: "✅Ovozli xabarlarni matnga o'girishga tayyorman.",
   },
   uz_cyrillic: {
     welcome:
@@ -102,5 +110,7 @@ export const translations = {
     shareToSupport: "Лойиҳамизни қўллаб-қувватлаш учун бошқалар билан улашинг!",
     shareBot: "Ботни юбориш 🚀",
     shareBotText: "Ишлатиб кўринг! Овозли хабарни матнга ўгирадиган бот.",
+    addedToGroup: "Овозли хабарларни эшитишим учун админ қилинг.",
+    promotedToAdmin: "✅Овозли хабарларни матнга ўгиришга тайёрман.",
   },
 };

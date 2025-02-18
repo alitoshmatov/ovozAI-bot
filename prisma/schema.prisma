@@ -31,6 +31,17 @@ model User {
   textMessageTokens Int      @default(0)
 }
 
+model Group {
+  id                Int      @id @default(autoincrement())
+  telegramId        String   @unique
+  title             String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  totalAudioSeconds Float    @default(0)
+  isKicked          Boolean  @default(false)
+  language          String   @default("uz") // Group's preferred language (en, ru, uz, uz_cyrillic)
+}
+
 model Audio {
   id              Int      @id @default(autoincrement())
   userId          Int

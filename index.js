@@ -59,6 +59,28 @@ const safeSendMessage = async (ctx, text, options = {}) => {
   }
 };
 
+const isAdmin = async (ctx) => {
+  try {
+    const chatId = ctx.chat.id;
+    const userId = ctx.from.id;
+
+    const member = await ctx.telegram.getChatMember(chatId, userId);
+
+    if (["administrator", "creator"].includes(member.status)) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.error("Error checking admin status:", error);
+    return false;
+  }
+};
+
+const isGroup = (ctx) => {
+  return ctx.chat.type === "group" || ctx.chat.type === "supergroup";
+};
+
 bot.command(commands.language, async (ctx) => {
   try {
     const user = await prisma.user.findUnique({
@@ -71,6 +93,71 @@ bot.command(commands.language, async (ctx) => {
     );
   } catch (error) {
     console.error(`Error in language command: ${error.message}`);
+  }
+});
+
+bot.on(message("new_chat_members"), async (ctx) => {
+  console.log("New chat members:", ctx.message.new_chat_members);
+  const botId = ctx.botInfo.id;
+
+  // Check if the bot is among new members
+  const botMember = ctx.message.new_chat_members.find(
+    (member) => member.id === botId
+  );
+
+  if (botMember) {
+    console.log("✅ Bot added to group:", ctx.chat.title);
+    const group = await prisma.group.upsert({
+      where: { telegramId: ctx.chat.id.toString() },
+      create: {
+        telegramId: ctx.chat.id.toString(),
+        title: ctx.chat.title,
+        isKicked: false,
+      },
+      update: {
+        title: ctx.chat.title,
+        isKicked: false,
+      },
+    });
+    ctx.reply(getMessage(group, "addedToGroup"));
+  }
+});
+
+// Handle bot removal
+bot.on(message("left_chat_member"), async (ctx) => {
+  const botId = ctx.botInfo.id;
+
+  if (ctx.message.left_chat_member.id === botId) {
+    await prisma.group.update({
+      where: { telegramId: ctx.chat.id.toString() },
+      data: { isKicked: true },
+    });
+  }
+});
+
+// Handle bot status changes (for admin promotion)
+bot.on("my_chat_member", async (ctx) => {
+  const chatMember = ctx.update.my_chat_member;
+  const newStatus = chatMember.new_chat_member.status;
+  const oldStatus = chatMember.old_chat_member.status;
+  const botId = ctx.botInfo.id;
+
+  if (chatMember.new_chat_member.user.id === botId) {
+    if (oldStatus !== "administrator" && newStatus === "administrator") {
+      const group = await prisma.group.upsert({
+        where: { telegramId: ctx.chat.id.toString() },
+        create: {
+          telegramId: ctx.chat.id.toString(),
+          title: ctx.chat.title,
+          isKicked: false,
+        },
+        update: {
+          title: ctx.chat.title,
+          isKicked: false,
+        },
+      });
+      ctx.reply(getMessage(group, "promotedToAdmin"));
+    }
   }
 });
 
@@ -149,6 +236,8 @@ bot.start(async (ctx) => {
 });
 
 bot.on(message("voice"), async (ctx) => {
+  console.log(ctx.message);
+
   const startTime = Date.now();
   // Show typing status
   await ctx.sendChatAction("typing");
@@ -298,12 +387,11 @@ bot.on(message("text"), async (ctx) => {
   // Do not answer if group, only answer when mentioned
   const isMentioned = ctx.message.text.includes(`@${BOT_USERNAME}`);
 
-  if (
-    (ctx.chat.type === "group" || ctx.chat.type === "supergroup") &&
-    !isMentioned
-  ) {
+  if (isGroup(ctx) && !isMentioned) {
     return;
   }
+
+  await ctx.sendChatAction("typing");
 
   const user = await prisma.user.findUnique({
     where: { telegramId: ctx.from.id.toString() },
