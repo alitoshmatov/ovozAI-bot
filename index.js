@@ -28,9 +28,11 @@ const prisma = new PrismaClient();
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
 function notifyOwner(message) {
-  bot.telegram.sendMessage(OWNER_ID, message, {
-    parse_mode: "Markdown",
-  });
+  bot.telegram
+    .sendMessage(OWNER_ID, message, {
+      parse_mode: "Markdown",
+    })
+    .catch((e) => {});
 }
 // Helper function to get message based on user's language
 const getMessage = (user, key) => {
@@ -55,7 +57,8 @@ const safeSendMessage = async (ctx, text, options = {}) => {
       console.log(`User ${ctx.from?.id} has blocked the bot`);
       return null;
     }
-    throw error;
+    console.log(error);
+    // throw error;
   }
 };
 
@@ -64,7 +67,9 @@ const isAdmin = async (ctx) => {
     const chatId = ctx.chat.id;
     const userId = ctx.from.id;
 
-    const member = await ctx.telegram.getChatMember(chatId, userId);
+    const member = await ctx.telegram
+      .getChatMember(chatId, userId)
+      .catch((e) => {});
 
     if (["administrator", "creator"].includes(member.status)) {
       return true;
@@ -119,7 +124,7 @@ bot.on(message("new_chat_members"), async (ctx) => {
         isKicked: false,
       },
     });
-    ctx.reply(getMessage(group, "addedToGroup"));
+    await safeSendMessage(ctx, getMessage(group, "addedToGroup"));
   }
 });
 
@@ -156,7 +161,7 @@ bot.on("my_chat_member", async (ctx) => {
           isKicked: false,
         },
       });
-      ctx.reply(getMessage(group, "promotedToAdmin"));
+      await safeSendMessage(ctx, getMessage(group, "promotedToAdmin"));
     }
   }
 });
@@ -243,7 +248,7 @@ bot.start(async (ctx) => {
       `Error starting bot: ${error.message}
       User: \n\`${JSON.stringify(ctx.from)}\``
     );
-    ctx.reply(getMessage(user, "error"));
+    safeSendMessage(ctx, getMessage(user, "error"));
   }
 });
 
@@ -252,12 +257,12 @@ bot.on(message("voice"), async (ctx) => {
 
   const startTime = Date.now();
   // Show typing status
-  await ctx.sendChatAction("typing");
+  await ctx.sendChatAction("typing").catch((e) => {});
 
   const voice = ctx.message.voice;
 
   if (voice.duration > 60 * 20) {
-    ctx.reply(getMessage(user, "fileTooLarge"));
+    await safeSendMessage(ctx, getMessage(user, "fileTooLarge"));
     return;
   }
 
@@ -293,7 +298,7 @@ bot.on(message("voice"), async (ctx) => {
   if (!isGroup(ctx)) {
     // Limit 1 hour
     if (user.totalAudioSeconds > 60 * 60 * 1 && !user.noLimit) {
-      ctx.reply(getMessage(user, "limitReached"));
+      safeSendMessage(getMessage(user, "limitReached"));
       notifyOwner(
         `User [${user.firstName}](tg://user?id=${user.telegramId}) reached the limit of 1 hour. Total audio seconds: ${user.totalAudioSeconds}`
       );
@@ -310,7 +315,7 @@ bot.on(message("voice"), async (ctx) => {
       });
     } else {
       if (group.totalAudioSeconds > 60 * 60 * 1) {
-        ctx.reply(getMessage(group, "limitReached"));
+        await safeSendMessage(ctx, getMessage(group, "limitReached"));
         notifyOwner(
           `Group [${group.title}](tg://user?id=${group.telegramId}) reached the limit of 1 hour. Total audio seconds: ${group.totalAudioSeconds}`
         );
@@ -376,7 +381,8 @@ bot.on(message("voice"), async (ctx) => {
     const shouldShare =
       user?._count?.audios !== 0 && (user?._count?.audios + 1) % 5 === 0;
 
-    ctx.reply(
+    await safeSendMessage(
+      ctx,
       `${transcription.text}
 ${
   shouldShare
@@ -422,7 +428,7 @@ ${
       \nUser: \n\`${JSON.stringify(ctx.from)}\``
     );
     console.error("Error transcribing voice message:", error);
-    ctx.reply(getMessage(user, "error"));
+    await safeSendMessage(ctx, getMessage(user, "error"));
   }
 });
 
@@ -434,14 +440,14 @@ bot.on(message("text"), async (ctx) => {
     return;
   }
 
-  await ctx.sendChatAction("typing");
+  await ctx.sendChatAction("typing").catch((e) => {});
 
   const user = await prisma.user.findUnique({
     where: { telegramId: ctx.from.id.toString() },
   });
 
   if (user.textMessageTokens >= 1000000) {
-    ctx.reply("Token limit reached");
+    await safeSendMessage(ctx, "Token limit reached");
     notifyOwner(
       `User [${user.firstName}](tg://user?id=${user.telegramId}) reached the limit of 1 million tokens. Text message tokens: ${user.textMessageTokens}`
     );
@@ -471,7 +477,7 @@ bot.on(message("text"), async (ctx) => {
       },
     })
     .then((res) => {});
-  ctx.reply(answer.text, {
+  await safeSendMessage(ctx, answer.text, {
     reply_to_message_id: isMentioned ? ctx.message.message_id : undefined,
   });
 });
