@@ -418,11 +418,11 @@ ${
     prisma.audio
       .create({
         data: {
-          userId: user.id,
+          userId: user?.id || null,
           duration: voice.duration,
           requestDuration,
           isSuccess: false,
-          groupId: isGroup(ctx) ? group.id : null,
+          groupId: isGroup(ctx) ? group?.id : null,
         },
       })
       .then((res) => {
