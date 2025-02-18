@@ -315,9 +315,15 @@ bot.on(message("voice"), async (ctx) => {
       });
     } else {
       if (group.totalAudioSeconds > 60 * 60 * 2) {
-        await safeSendMessage(ctx, getMessage(group, "limitReached"));
+        await safeSendMessage(
+          ctx,
+          translations[group.language || "en"].maxLimitReached(2),
+          {
+            disable_notification: true,
+          }
+        );
         notifyOwner(
-          `Group [${group.title}](tg://user?id=${group.telegramId}) reached the limit of 1 hour. Total audio seconds: ${group.totalAudioSeconds}`
+          `Group [${group.title}](tg://user?id=${group.telegramId}) reached the limit of 2 hour. Total audio seconds: ${group.totalAudioSeconds}`
         );
         return;
       }
@@ -341,7 +347,7 @@ bot.on(message("voice"), async (ctx) => {
             {
               type: "text",
               text: `You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'.${
-                user.language === "uz_cyrillic" ? "Use cyrillic letters." : ""
+                user?.language === "uz_cyrillic" ? "Use cyrillic letters." : ""
               }`,
             },
             {
@@ -360,11 +366,11 @@ bot.on(message("voice"), async (ctx) => {
     Promise.all([
       prisma.audio.create({
         data: {
-          userId: user.id,
+          userId: user?.id,
           duration: voice.duration,
           requestDuration,
           isSuccess: true,
-          groupId: isGroup(ctx) ? group.id : null,
+          groupId: isGroup(ctx) ? group?.id : null,
         },
       }),
       isGroup(ctx)
@@ -555,7 +561,11 @@ cron.schedule("0 0 1 * *", resetLimits);
 
 bot.catch((err, ctx) => {
   // console.error("Error in bot:", err);
-  notifyOwner(`Error in bot: ${err.message}`);
+  console.log("CATCHED ERRRRRORRRR:", err);
+  notifyOwner(`Error in bot: 
+    \nError: ${err.message}
+  
+    ${JSON.stringify(err)}`);
 });
 
 // Cleanup

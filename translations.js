@@ -24,6 +24,8 @@ export const translations = {
     shareBotText: "Try it out! A bot that transcribes voice messages to text.",
     addedToGroup: "Make me an admin to listen to voice messages.",
     promotedToAdmin: "✅ I can now transcribe voice messages to text.",
+    maxLimitReached: (hours) =>
+      `⚠️ You have reached the maximum limit of ${hours} hours.`,
   },
   ru: {
     welcome:
@@ -58,6 +60,8 @@ export const translations = {
       "Сделайте меня администратором, чтобы прослушивать голосовые сообщения.",
     promotedToAdmin:
       "✅ Я могу теперь транскрибировать голосовые сообщения в текст.",
+    maxLimitReached: (hours) =>
+      `⚠️ Вы достигли максимального лимита в ${hours} часов.`,
   },
   uz: {
     welcome:
@@ -85,6 +89,8 @@ export const translations = {
     shareBotText: "Ishlatib ko'ring! Ovozli xabarni matnga o'giradigan bot.",
     addedToGroup: "Ovozli xabarlarni eshitishim uchun admin qiling.",
     promotedToAdmin: "✅Ovozli xabarlarni matnga o'girishga tayyorman.",
+    maxLimitReached: (hours) =>
+      `⚠️ Siz ${hours} soatlik maksimal limitga etdingiz.`,
   },
   uz_cyrillic: {
     welcome:
@@ -112,5 +118,7 @@ export const translations = {
     shareBotText: "Ишлатиб кўринг! Овозли хабарни матнга ўгирадиган бот.",
     addedToGroup: "Овозли хабарларни эшитишим учун админ қилинг.",
     promotedToAdmin: "✅Овозли хабарларни матнга ўгиришга тайёрман.",
+    maxLimitReached: (hours) =>
+      `⚠️ Сиз ${hours} соатлик максимал лимитга етдингиз.`,
   },
 };
