@@ -18,14 +18,14 @@ const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
 prisma.user
   .findMany()
-  .then((res) => {
-    res.forEach(async (user) => {
+  .then(async (res) => {
+    for (const user of res) {
       console.log("Sending");
       await bot.telegram.sendMessage(user.telegramId, message[user.language]);
       console.log(
         `Sent to ${user.username} ${user.firstName} ${user.lastName} (${user.telegramId})`
       );
-    });
+    }
   })
   .catch((e) => {
     console.log(e);
