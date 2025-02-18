@@ -452,6 +452,10 @@ bot.on(message("text"), async (ctx) => {
     where: { telegramId: ctx.from.id.toString() },
   });
 
+  if (!user) {
+    return;
+  }
+
   if (user.textMessageTokens >= 1000000) {
     await safeSendMessage(ctx, "Token limit reached");
     notifyOwner(
