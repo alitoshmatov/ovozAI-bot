@@ -213,7 +213,7 @@ bot.hears(
 bot.start(async (ctx) => {
   try {
     const telegramId = ctx.from.id.toString();
-    const referrerId = ctx.payload;
+    // const referrerId = ctx.payload;
 
     // Create or update user
     const user = await prisma.user.upsert({
@@ -223,7 +223,7 @@ bot.start(async (ctx) => {
         firstName: ctx.from.first_name,
         lastName: ctx.from.last_name,
         username: ctx.from.username,
-        referrerId: referrerId || "", // Store the referrer ID
+        // referrerId: referrerId || "", // Store the referrer ID
       },
       update: {
         firstName: ctx.from.first_name,
