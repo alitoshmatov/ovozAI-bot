@@ -21,10 +21,15 @@ prisma.user
   .then(async (res) => {
     for (const user of res) {
       console.log("Sending");
-      await bot.telegram.sendMessage(user.telegramId, message[user.language]);
-      console.log(
-        `Sent to ${user.username} ${user.firstName} ${user.lastName} (${user.telegramId})`
-      );
+      try {
+        await bot.telegram.sendMessage(user.telegramId, message[user.language]);
+
+        console.log(
+          `Sent to ${user.username} ${user.firstName} ${user.lastName} (${user.telegramId})`
+        );
+      } catch (e) {
+        console.log(e);
+      }
     }
   })
   .catch((e) => {
