@@ -314,7 +314,7 @@ bot.on(message("voice"), async (ctx) => {
         },
       });
     } else {
-      if (group.totalAudioSeconds > 60 * 60 * 1) {
+      if (group.totalAudioSeconds > 60 * 60 * 2) {
         await safeSendMessage(ctx, getMessage(group, "limitReached"));
         notifyOwner(
           `Group [${group.title}](tg://user?id=${group.telegramId}) reached the limit of 1 hour. Total audio seconds: ${group.totalAudioSeconds}`
