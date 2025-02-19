@@ -530,8 +530,6 @@ bot.on(message("text"), async (ctx) => {
   });
 });
 
-bot.launch();
-
 const getSummary = async () => {
   try {
     // Get today's date at midnight
@@ -647,6 +645,10 @@ bot.catch(async (err, ctx) => {
     // Last resort error logging if notification fails
     console.error("Error in error handler:", notificationError);
   }
+});
+
+bot.launch({ dropPendingUpdates: true }).then(() => {
+  console.log("Bot started with all previous updates dropped.");
 });
 
 // Cleanup
