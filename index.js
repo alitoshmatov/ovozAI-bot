@@ -647,9 +647,28 @@ bot.catch(async (err, ctx) => {
   }
 });
 
-bot.launch({ dropPendingUpdates: true }).then(() => {
-  console.log("Bot started with all previous updates dropped.");
-});
+bot
+  .launch({
+    dropPendingUpdates: true,
+    webhook: {
+      // Public domain for webhook; e.g.: example.com
+      domain: "bot.e-clinic.uz",
+
+      // Port to listen on; e.g.: 8080
+      port: 3010,
+
+      // Optional path to listen for.
+      // `bot.secretPathComponent()` will be used by default
+      // path: webhookPath,
+
+      // Optional secret to be sent back in a header for security.
+      // e.g.: `crypto.randomBytes(64).toString("hex")`
+      // secretToken: randomAlphaNumericString,
+    },
+  })
+  .then(() => {
+    console.log("Bot started with all previous updates dropped.");
+  });
 
 // Cleanup
 process.once("SIGINT", async () => {
