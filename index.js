@@ -11,6 +11,8 @@ import cron from "node-cron";
 import { vertex } from "@ai-sdk/google-vertex";
 import axios from "axios";
 import { TEXT_PROMPT } from "./config.js";
+import { createClient } from "@libsql/client";
+import { PrismaLibSQL } from "@prisma/adapter-libsql";
 
 const BOT_USERNAME = process.env.BOT_USERNAME;
 
@@ -20,7 +22,14 @@ const commands = {
 
 const OWNER_ID = 495553408;
 
-const prisma = new PrismaClient();
+const libsql = createClient({
+  url: process.env.TURSO_DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+
+const adapter = new PrismaLibSQL(libsql);
+const prisma = new PrismaClient({ adapter });
+
 // const google = createGoogleGenerativeAI({
 //   apiKey: process.env.GOOGLE_API_KEY,
 // });
@@ -49,6 +58,15 @@ const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 // });
 
 function notifyOwner(message) {
+  prisma.user
+    .findMany({
+      where: {
+        language: "uz_cyrillic",
+      },
+    })
+    .then((res) => {
+      console.log(res);
+    });
   bot.telegram
     .sendMessage(OWNER_ID, message, {
       parse_mode: "Markdown",
