@@ -28,16 +28,7 @@ const libsql = createClient({
 });
 
 const adapter = new PrismaLibSQL(libsql);
-const prisma = new PrismaClient({
-  adapter,
-  connection: {
-    pool: {
-      min: 2,
-      max: 10,
-      idle: 10000,
-    },
-  },
-});
+const prisma = new PrismaClient({ adapter });
 process.on("unhandledRejection", (reason, promise) => {
   console.error("Unhandled Rejection at:", promise, "reason:", reason);
   // Consider graceful shutdown if critical
