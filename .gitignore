@@ -8,7 +8,7 @@ package-lock.json
 .env.*.local
 
 dev.db
-vertex.json
+# vertex.json
 
 # Build output
 dist/
