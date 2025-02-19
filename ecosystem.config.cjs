@@ -14,7 +14,7 @@ module.exports = {
         NODE_ENV: "production",
       },
       // Resource limitations
-      node_args: "--max-old-space-size=256", // Limit Node.js memory to 256MB
+      node_args: "--max-old-space-size=100", // Limit Node.js memory to 256MB
       cpu: "25%", // Limit CPU usage to 25%
     },
   ],
