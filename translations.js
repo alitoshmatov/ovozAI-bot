@@ -26,6 +26,7 @@ export const translations = {
     promotedToAdmin: "✅ I can now transcribe voice messages to text.",
     maxLimitReached: (hours) =>
       `⚠️ You have reached the maximum limit of ${hours} hours.`,
+    sendVoiceMessage: "Send me a voice message to transcribe it.",
   },
   ru: {
     welcome:
@@ -62,6 +63,7 @@ export const translations = {
       "✅ Я могу теперь транскрибировать голосовые сообщения в текст.",
     maxLimitReached: (hours) =>
       `⚠️ Вы достигли максимального лимита в ${hours} часов.`,
+    sendVoiceMessage: "Отправьте мне голосовое сообщение для транскрибации.",
   },
   uz: {
     welcome:
@@ -91,6 +93,8 @@ export const translations = {
     promotedToAdmin: "✅Ovozli xabarlarni matnga o'girishga tayyorman.",
     maxLimitReached: (hours) =>
       `⚠️ Siz ${hours} soatlik maksimal limitga etdingiz.`,
+    sendVoiceMessage:
+      "Menga 🎙️ovozli xabarni jo'nating va men uni matnga o'giraman.",
   },
   uz_cyrillic: {
     welcome:
@@ -120,5 +124,7 @@ export const translations = {
     promotedToAdmin: "✅Овозли хабарларни матнга ўгиришга тайёрман.",
     maxLimitReached: (hours) =>
       `⚠️ Сиз ${hours} соатлик максимал лимитга етдингиз.`,
+    sendVoiceMessage:
+      "Менга 🎙️овозли хабарни жўнатинг ва мен уни матнга ўгираман.",
   },
 };

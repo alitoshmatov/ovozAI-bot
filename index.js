@@ -28,8 +28,20 @@ const libsql = createClient({
 });
 
 const adapter = new PrismaLibSQL(libsql);
-const prisma = new PrismaClient({ adapter });
-
+const prisma = new PrismaClient({
+  adapter,
+  connection: {
+    pool: {
+      min: 2,
+      max: 10,
+      idle: 10000,
+    },
+  },
+});
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  // Consider graceful shutdown if critical
+});
 // const google = createGoogleGenerativeAI({
 //   apiKey: process.env.GOOGLE_API_KEY,
 // });
@@ -370,12 +382,13 @@ bot.on(message("voice"), async (ctx) => {
 
     const fileLink = await ctx.telegram.getFileLink(voice.file_id);
 
+    let audioData;
     try {
       // Download the file
       const response = await axios.get(fileLink.href, {
         responseType: "arraybuffer",
       });
-      const audioData = Buffer.from(response.data);
+      audioData = Buffer.from(response.data);
 
       const transcription = await generateText({
         model: vertex("gemini-2.0-flash"),
@@ -388,7 +401,7 @@ bot.on(message("voice"), async (ctx) => {
                 type: "text",
                 text: `You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'.${
                   user?.language === "uz_cyrillic"
-                    ? "Use cyrillic letters."
+                    ? "Use cyrillic letters for uzbek language."
                     : ""
                 }`,
               },
@@ -478,11 +491,23 @@ ${
       );
       console.error("Error transcribing voice message:", error);
       await safeSendMessage(ctx, getMessage(user, "error"));
+    } finally {
+      audioData = null;
+      // Consider forcing garbage collection if node allows it
+      if (global.gc) global.gc();
     }
   } catch (error) {
     console.error("Error in voice message handler:", error);
     await safeSendMessage(ctx, getMessage(user, "error"));
   }
+});
+
+bot.on("message", async (ctx) => {
+  if (isGroup(ctx)) {
+    return;
+  }
+
+  safeSendMessage(ctx, getMessage(user, "sendVoiceMessage"));
 });
 
 // bot.on(message("text"), async (ctx) => {
