@@ -27,26 +27,26 @@ const prisma = new PrismaClient();
 
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
-bot.use(async (ctx, next) => {
-  try {
-    console.log(ctx.update);
-    const update = await prisma.update.upsert({
-      where: { id: ctx.update.update_id?.toString() || "" },
-      update: { handled: { increment: 1 } },
-      create: { id: ctx.update.update_id?.toString() },
-    });
+// bot.use(async (ctx, next) => {
+//   try {
+//     console.log(ctx.update);
+//     const update = await prisma.update.upsert({
+//       where: { id: ctx.update.update_id?.toString() || "" },
+//       update: { handled: { increment: 1 } },
+//       create: { id: ctx.update.update_id?.toString() },
+//     });
 
-    if (update.handled > 2) {
-      console.log("Update handled more than 2 times", ctx.update.id);
-      return;
-    }
+//     if (update.handled > 2) {
+//       console.log("Update handled more than 2 times", ctx.update.id);
+//       return;
+//     }
 
-    await next();
-  } catch (error) {
-    console.log("Error in bot update");
-    console.log(error);
-  }
-});
+//     await next();
+//   } catch (error) {
+//     console.log("Error in bot update");
+//     console.log(error);
+//   }
+// });
 
 function notifyOwner(message) {
   bot.telegram
@@ -476,59 +476,59 @@ ${
   }
 });
 
-bot.on(message("text"), async (ctx) => {
-  // Do not answer if group, only answer when mentioned
-  const isMentioned = ctx.message.text.includes(`@${BOT_USERNAME}`);
+// bot.on(message("text"), async (ctx) => {
+//   // Do not answer if group, only answer when mentioned
+//   const isMentioned = ctx.message.text.includes(`@${BOT_USERNAME}`);
 
-  if (isGroup(ctx)) {
-    return;
-  }
+//   if (isGroup(ctx)) {
+//     return;
+//   }
 
-  await ctx.sendChatAction("typing").catch((e) => {});
+//   await ctx.sendChatAction("typing").catch((e) => {});
 
-  const user = await prisma.user.findUnique({
-    where: { telegramId: ctx.from.id.toString() },
-  });
+//   const user = await prisma.user.findUnique({
+//     where: { telegramId: ctx.from.id.toString() },
+//   });
 
-  if (!user) {
-    return;
-  }
+//   if (!user) {
+//     return;
+//   }
 
-  if (user.textMessageTokens >= 1000000) {
-    await safeSendMessage(ctx, "Token limit reached");
-    notifyOwner(
-      `User [${user.firstName}](tg://user?id=${user.telegramId}) reached the limit of 1 million tokens. Text message tokens: ${user.textMessageTokens}`
-    );
-    return;
-  }
+//   if (user.textMessageTokens >= 1000000) {
+//     await safeSendMessage(ctx, "Token limit reached");
+//     notifyOwner(
+//       `User [${user.firstName}](tg://user?id=${user.telegramId}) reached the limit of 1 million tokens. Text message tokens: ${user.textMessageTokens}`
+//     );
+//     return;
+//   }
 
-  const answer = await generateText({
-    model: vertex("gemini-2.0-flash"),
-    maxRetries: 1,
-    messages: [
-      {
-        role: "system",
-        content: TEXT_PROMPT(user.language),
-      },
-      {
-        role: "user",
-        content: ctx.message.text,
-      },
-    ],
-  });
-  prisma.user
-    .update({
-      where: { telegramId: ctx.from.id.toString() },
-      data: {
-        textMessageCount: { increment: 1 },
-        textMessageTokens: { increment: answer.usage.totalTokens },
-      },
-    })
-    .then((res) => {});
-  await safeSendMessage(ctx, answer.text, {
-    reply_to_message_id: isMentioned ? ctx.message.message_id : undefined,
-  });
-});
+//   const answer = await generateText({
+//     model: vertex("gemini-2.0-flash"),
+//     maxRetries: 1,
+//     messages: [
+//       {
+//         role: "system",
+//         content: TEXT_PROMPT(user.language),
+//       },
+//       {
+//         role: "user",
+//         content: ctx.message.text,
+//       },
+//     ],
+//   });
+//   prisma.user
+//     .update({
+//       where: { telegramId: ctx.from.id.toString() },
+//       data: {
+//         textMessageCount: { increment: 1 },
+//         textMessageTokens: { increment: answer.usage.totalTokens },
+//       },
+//     })
+//     .then((res) => {});
+//   await safeSendMessage(ctx, answer.text, {
+//     reply_to_message_id: isMentioned ? ctx.message.message_id : undefined,
+//   });
+// });
 
 const getSummary = async () => {
   try {
