@@ -102,7 +102,6 @@ bot.command(commands.language, async (ctx) => {
 });
 
 bot.on(message("new_chat_members"), async (ctx) => {
-  console.log("New chat members:", ctx.message.new_chat_members);
   const botId = ctx.botInfo.id;
 
   // Check if the bot is among new members
@@ -248,192 +247,210 @@ bot.start(async (ctx) => {
       `Error starting bot: ${error.message}
       User: \n\`${JSON.stringify(ctx.from)}\``
     );
+
     safeSendMessage(ctx, getMessage(user, "error"));
   }
 });
 
 bot.on(message("voice"), async (ctx) => {
-  console.log(ctx.message);
+  try {
+    const startTime = Date.now();
+    // Show typing status
+    await ctx.sendChatAction("typing").catch((e) => {});
 
-  const startTime = Date.now();
-  // Show typing status
-  await ctx.sendChatAction("typing").catch((e) => {});
+    const voice = ctx.message.voice;
+    const telegramId = ctx.from.id.toString();
 
-  const voice = ctx.message.voice;
-
-  if (voice.duration > 60 * 20) {
-    await safeSendMessage(ctx, getMessage(user, "fileTooLarge"));
-    return;
-  }
-
-  const telegramId = ctx.from.id.toString();
-  const fileLink = await ctx.telegram.getFileLink(voice.file_id);
-
-  const user = await prisma.user.findUnique({
-    where: { telegramId },
-    select: {
-      firstName: true,
-      language: true,
-      totalAudioSeconds: true,
-      noLimit: true,
-      referrerId: true,
-      id: true,
-      telegramId: true,
-      _count: {
-        select: {
-          audios: {
-            where: {
-              isSuccess: true,
+    const user = await prisma.user.findUnique({
+      where: { telegramId },
+      select: {
+        firstName: true,
+        language: true,
+        totalAudioSeconds: true,
+        noLimit: true,
+        referrerId: true,
+        id: true,
+        telegramId: true,
+        _count: {
+          select: {
+            audios: {
+              where: {
+                isSuccess: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  const group = await prisma.group.findUnique({
-    where: { telegramId: ctx.chat.id.toString() },
-  });
+    // Default to English if user not found
+    const userLanguage = user?.language || "en";
 
-  if (!isGroup(ctx)) {
-    // Limit 1 hour
-    if (user.totalAudioSeconds > 60 * 60 * 1 && !user.noLimit) {
-      safeSendMessage(getMessage(user, "limitReached"));
-      notifyOwner(
-        `User [${user.firstName}](tg://user?id=${user.telegramId}) reached the limit of 1 hour. Total audio seconds: ${user.totalAudioSeconds}`
+    if (voice.duration > 60 * 20) {
+      await safeSendMessage(
+        ctx,
+        translations[userLanguage].fileTooLarge || "File too large"
       );
       return;
     }
-  } else {
-    if (!group) {
-      await prisma.group.create({
-        data: {
-          telegramId: ctx.chat.id.toString(),
-          title: ctx.chat.title,
-          isKicked: false,
-        },
-      });
-    } else {
-      if (group.totalAudioSeconds > 60 * 60 * 2) {
+
+    const group = isGroup(ctx)
+      ? await prisma.group.findUnique({
+          where: { telegramId: ctx.chat.id.toString() },
+        })
+      : null;
+
+    if (!isGroup(ctx)) {
+      // Limit 1 hour
+      if (user?.totalAudioSeconds > 60 * 60 * 1 && !user?.noLimit) {
         await safeSendMessage(
           ctx,
-          translations[group.language || "en"].maxLimitReached(2),
-          {
-            disable_notification: true,
-          }
+          translations[userLanguage].limitReached || "Limit reached"
         );
         notifyOwner(
-          `Group [${group.title}](tg://user?id=${group.telegramId}) reached the limit of 2 hour. Total audio seconds: ${group.totalAudioSeconds}`
+          `User [${user?.firstName}](tg://user?id=${user?.telegramId}) reached the limit of 1 hour. Total audio seconds: ${user?.totalAudioSeconds}`
         );
         return;
       }
+    } else {
+      if (!group) {
+        await prisma.group.create({
+          data: {
+            telegramId: ctx.chat.id.toString(),
+            title: ctx.chat.title,
+            isKicked: false,
+          },
+        });
+      } else {
+        if (group.totalAudioSeconds > 60 * 60 * 2) {
+          await safeSendMessage(
+            ctx,
+            translations[group.language || "en"].maxLimitReached(2),
+            {
+              disable_notification: true,
+            }
+          );
+          notifyOwner(
+            `Group [${group.title}](tg://user?id=${group.telegramId}) reached the limit of 2 hour. Total audio seconds: ${group.totalAudioSeconds}`
+          );
+          return;
+        }
+      }
     }
-  }
 
-  try {
-    // Download the file
-    const response = await axios.get(fileLink.href, {
-      responseType: "arraybuffer",
-    });
-    const audioData = Buffer.from(response.data);
+    const fileLink = await ctx.telegram.getFileLink(voice.file_id);
 
-    const transcription = await generateText({
-      model: vertex("gemini-2.0-flash"),
-      maxRetries: 1,
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'.${
-                user?.language === "uz_cyrillic" ? "Use cyrillic letters." : ""
-              }`,
-            },
-            {
-              type: "file",
-              data: audioData,
-              mimeType: "audio/ogg",
-            },
-          ],
-        },
-      ],
-    });
+    try {
+      // Download the file
+      const response = await axios.get(fileLink.href, {
+        responseType: "arraybuffer",
+      });
+      const audioData = Buffer.from(response.data);
 
-    // Request duration in seconds
-    const requestDuration = (Date.now() - startTime) / 1000;
+      const transcription = await generateText({
+        model: vertex("gemini-2.0-flash"),
+        maxRetries: 1,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: `You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'.${
+                  user?.language === "uz_cyrillic"
+                    ? "Use cyrillic letters."
+                    : ""
+                }`,
+              },
+              {
+                type: "file",
+                data: audioData,
+                mimeType: "audio/ogg",
+              },
+            ],
+          },
+        ],
+      });
 
-    Promise.all([
-      prisma.audio.create({
-        data: {
-          userId: user?.id,
-          duration: voice.duration,
-          requestDuration,
-          isSuccess: true,
-          groupId: isGroup(ctx) ? group?.id : null,
-        },
-      }),
-      isGroup(ctx)
-        ? prisma.group.update({
-            where: { telegramId: ctx.chat.id.toString() },
-            data: { totalAudioSeconds: { increment: voice.duration } },
-          })
-        : prisma.user.update({
-            where: { telegramId },
-            data: { totalAudioSeconds: { increment: voice.duration } },
-          }),
-    ]).then(() => {});
+      // Request duration in seconds
+      const requestDuration = (Date.now() - startTime) / 1000;
 
-    const shouldShare =
-      user?._count?.audios !== 0 && (user?._count?.audios + 1) % 5 === 0;
+      Promise.all([
+        prisma.audio.create({
+          data: {
+            userId: user?.id,
+            duration: voice.duration,
+            requestDuration,
+            isSuccess: true,
+            groupId: isGroup(ctx) ? group?.id : null,
+          },
+        }),
+        isGroup(ctx)
+          ? prisma.group.update({
+              where: { telegramId: ctx.chat.id.toString() },
+              data: { totalAudioSeconds: { increment: voice.duration } },
+            })
+          : prisma.user.update({
+              where: { telegramId },
+              data: { totalAudioSeconds: { increment: voice.duration } },
+            }),
+      ]).then(() => {});
 
-    await safeSendMessage(
-      ctx,
-      `${transcription.text}
+      const shouldShare =
+        user?._count?.audios !== 0 && (user?._count?.audios + 1) % 5 === 0;
+
+      await safeSendMessage(
+        ctx,
+        `${transcription.text}
 ${
   shouldShare
-    ? `\n<blockquote>${translations[user.language].shareToSupport}</blockquote>`
+    ? `\n<blockquote>${translations[userLanguage].shareToSupport}</blockquote>`
     : ""
 }`,
-      {
-        parse_mode: "HTML",
-        reply_to_message_id: ctx.message.message_id,
-        reply_markup: shouldShare
-          ? Markup.inlineKeyboard([
-              [
-                Markup.button.url(
-                  translations[user.language].shareBot,
-                  `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=${
-                    user.telegramId
-                  }&text=\n\n${translations[user.language].shareBotText}`
-                ),
-              ],
-            ]).reply_markup
-          : null,
-      }
-    );
-  } catch (error) {
-    const requestDuration = (Date.now() - startTime) / 1000;
+        {
+          parse_mode: "HTML",
+          reply_to_message_id: ctx.message.message_id,
+          reply_markup: shouldShare
+            ? Markup.inlineKeyboard([
+                [
+                  Markup.button.url(
+                    translations[userLanguage].shareBot,
+                    `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=${user.telegramId}&text=\n\n${translations[userLanguage].shareBotText}`
+                  ),
+                ],
+              ]).reply_markup
+            : null,
+        }
+      );
+    } catch (error) {
+      const requestDuration = (Date.now() - startTime) / 1000;
 
-    prisma.audio
-      .create({
-        data: {
-          userId: user?.id || null,
-          duration: voice.duration,
-          requestDuration,
-          isSuccess: false,
-          groupId: isGroup(ctx) ? group?.id : null,
-        },
-      })
-      .then((res) => {
-        // console.log(res);
-      });
-    notifyOwner(
-      `Error transcribing voice message: ${error.message}
-      \nVoice: \n\`${JSON.stringify(ctx.message.voice)}\`
-      \nUser: \n\`${JSON.stringify(ctx.from)}\``
-    );
-    console.error("Error transcribing voice message:", error);
+      prisma.audio
+        .create({
+          data: {
+            userId: user?.id || null,
+            duration: voice.duration,
+            requestDuration,
+            isSuccess: false,
+            groupId: isGroup(ctx) ? group?.id : null,
+          },
+        })
+        .then((res) => {
+          // console.log(res);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+      notifyOwner(
+        `Error transcribing voice message: ${error.message}
+        \nVoice: \n\`${JSON.stringify(ctx.message.voice)}\`
+        \nUser: \n\`${JSON.stringify(ctx.from)}\``
+      );
+      console.error("Error transcribing voice message:", error);
+      await safeSendMessage(ctx, getMessage(user, "error"));
+    }
+  } catch (error) {
+    console.error("Error in voice message handler:", error);
     await safeSendMessage(ctx, getMessage(user, "error"));
   }
 });
@@ -563,13 +580,52 @@ cron.schedule("0 16 * * *", getSummary);
 // Reset limits each month
 cron.schedule("0 0 1 * *", resetLimits);
 
-bot.catch((err, ctx) => {
-  // console.error("Error in bot:", err);
-  console.log("CATCHED ERRRRRORRRR:", err);
-  notifyOwner(`Error in bot: 
-    \nError: ${err.message}
-  
-    ${JSON.stringify(err)}`);
+bot.catch(async (err, ctx) => {
+  console.error("Bot error:", err);
+
+  try {
+    // Try to get basic context information safely
+    const errorInfo = {
+      updateType: ctx?.updateType,
+      userId: ctx?.from?.id,
+      chatId: ctx?.chat?.id,
+      messageId: ctx?.message?.message_id,
+      error: {
+        message: err.message,
+        stack: err.stack,
+      },
+    };
+
+    // Notify owner with structured error information
+    await notifyOwner(
+      `🚨 Bot Error Report:\n\`\`\`json\n${JSON.stringify(
+        errorInfo,
+        null,
+        2
+      )}\n\`\`\``
+    );
+
+    // If we have context, try to notify the user
+    if (ctx) {
+      const user = ctx.from?.id
+        ? await prisma.user.findUnique({
+            where: { telegramId: ctx.from.id.toString() },
+          })
+        : null;
+
+      await safeSendMessage(
+        ctx,
+        translations[user?.language || "en"].error ||
+          "An error occurred. Please try again later.",
+        { reply_to_message_id: ctx.message?.message_id }
+      ).catch(() => {
+        /* Ignore send errors */
+      });
+    }
+  } catch (notificationError) {
+    // Last resort error logging if notification fails
+    console.error("Error in error handler:", notificationError);
+  }
 });
 
 // Cleanup
