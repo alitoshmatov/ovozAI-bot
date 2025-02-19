@@ -659,7 +659,7 @@ bot
 
       // Optional path to listen for.
       // `bot.secretPathComponent()` will be used by default
-      // path: webhookPath,
+      path: "/updates",
 
       // Optional secret to be sent back in a header for security.
       // e.g.: `crypto.randomBytes(64).toString("hex")`
