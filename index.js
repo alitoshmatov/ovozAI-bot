@@ -29,6 +29,7 @@ const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
 bot.use(async (ctx, next) => {
   try {
+    console.log(ctx.update);
     const update = await prisma.update.upsert({
       where: { id: ctx.update.update_id?.toString() || "" },
       update: { handled: { increment: 1 } },
