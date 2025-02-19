@@ -69,7 +69,7 @@ function notifyOwner(message) {
 }
 // Helper function to get message based on user's language
 const getMessage = (user, key) => {
-  return translations[user.language][key];
+  return translations[user?.language || "uz"][key];
 };
 
 // Create language selection keyboard
@@ -498,6 +498,14 @@ bot.on("message", async (ctx) => {
     return;
   }
 
+  const user = await prisma.user
+    .findUnique({
+      where: { telegramId: ctx.from.id.toString() },
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
   safeSendMessage(ctx, getMessage(user, "sendVoiceMessage"));
 });
 
@@ -697,10 +705,10 @@ bot
 
 // Cleanup
 process.once("SIGINT", async () => {
-  await prisma.$disconnect();
   bot.stop("SIGINT");
+  await prisma.$disconnect();
 });
 process.once("SIGTERM", async () => {
-  await prisma.$disconnect();
   bot.stop("SIGTERM");
+  await prisma.$disconnect();
 });
