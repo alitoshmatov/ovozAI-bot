@@ -58,15 +58,6 @@ const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 // });
 
 function notifyOwner(message) {
-  prisma.user
-    .findMany({
-      where: {
-        language: "uz_cyrillic",
-      },
-    })
-    .then((res) => {
-      console.log(res);
-    });
   bot.telegram
     .sendMessage(OWNER_ID, message, {
       parse_mode: "Markdown",
