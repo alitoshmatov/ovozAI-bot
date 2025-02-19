@@ -480,7 +480,7 @@ bot.on(message("text"), async (ctx) => {
   // Do not answer if group, only answer when mentioned
   const isMentioned = ctx.message.text.includes(`@${BOT_USERNAME}`);
 
-  if (isGroup(ctx) && !isMentioned) {
+  if (isGroup(ctx)) {
     return;
   }
 
