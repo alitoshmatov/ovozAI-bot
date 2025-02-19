@@ -55,3 +55,10 @@ model Audio {
   groupId         Int?
   group           Group?   @relation(fields: [groupId], references: [id])
 }
+
+model Update {
+  id        String   @id
+  handled   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -27,6 +27,26 @@ const prisma = new PrismaClient();
 
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
+bot.use(async (ctx, next) => {
+  try {
+    const update = await prisma.update.upsert({
+      where: { id: ctx.update.update_id?.toString() || "" },
+      update: { handled: { increment: 1 } },
+      create: { id: ctx.update.update_id?.toString() },
+    });
+
+    if (update.handled > 2) {
+      console.log("Update handled more than 2 times", ctx.update.id);
+      return;
+    }
+
+    await next();
+  } catch (error) {
+    console.log("Error in bot update");
+    console.log(error);
+  }
+});
+
 function notifyOwner(message) {
   bot.telegram
     .sendMessage(OWNER_ID, message, {
