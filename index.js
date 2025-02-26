@@ -120,6 +120,10 @@ const isGroup = (ctx) => {
 };
 
 bot.command(commands.language, async (ctx) => {
+  if (isGroup(ctx)) {
+    return;
+  }
+
   try {
     const user = await prisma.user.findUnique({
       where: { telegramId: ctx.from.id.toString() },
@@ -177,6 +181,10 @@ bot.on(message("left_chat_member"), async (ctx) => {
 bot.hears(
   ["English 🇬🇧", "Русский 🇷🇺", "O'zbek 🇺🇿", "Ўзбек 🇺🇿"],
   async (ctx) => {
+    if (isGroup(ctx)) {
+      return;
+    }
+
     try {
       const languageMap = {
         "English 🇬🇧": "en",
