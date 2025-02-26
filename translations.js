@@ -23,8 +23,8 @@ export const translations = {
     shareToSupport: "Share the bot with others to support our project!",
     shareBot: "Share the bot 🚀",
     shareBotText: "Try it out! A bot that transcribes voice messages to text.",
-    addedToGroup: "Make me an admin to listen to voice messages.",
-    promotedToAdmin: "✅ I can now transcribe voice messages to text.",
+    addedToGroup:
+      "✅ Now I will automatically transcribe all voice messages to text.",
     maxLimitReached: (hours) =>
       `⚠️ You have reached the maximum limit of ${hours} hours.`,
     sendVoiceMessage: "Send me a voice message to transcribe it.",
@@ -60,9 +60,7 @@ export const translations = {
     shareBotText:
       "Попробуйте! Бот, который транскрибирует голосовые сообщения в текст.",
     addedToGroup:
-      "Сделайте меня администратором, чтобы прослушивать голосовые сообщения.",
-    promotedToAdmin:
-      "✅ Я могу теперь транскрибировать голосовые сообщения в текст.",
+      "✅ Теперь я буду автоматически транскрибировать все голосовые сообщения в текст.",
     maxLimitReached: (hours) =>
       `⚠️ Вы достигли максимального лимита в ${hours} часов.`,
     sendVoiceMessage: "Отправьте мне голосовое сообщение для транскрибации.",
@@ -92,8 +90,8 @@ export const translations = {
       "Loyihamizni qo'llab-quvvatlash uchun boshqalar bilan ulashing!",
     shareBot: "Botni yuborish 🚀",
     shareBotText: "Ishlatib ko'ring! Ovozli xabarni matnga o'giradigan bot.",
-    addedToGroup: "Ovozli xabarlarni eshitishim uchun admin qiling.",
-    promotedToAdmin: "✅Ovozli xabarlarni matnga o'girishga tayyorman.",
+    addedToGroup:
+      "✅ Endi men barcha ovozli xabarlarni avtomatik tarzda matnga o'giraman.",
     maxLimitReached: (hours) =>
       `⚠️ Siz ${hours} soatlik maksimal limitga etdingiz.`,
     sendVoiceMessage:
@@ -124,8 +122,8 @@ export const translations = {
     shareToSupport: "Лойиҳамизни қўллаб-қувватлаш учун бошқалар билан улашинг!",
     shareBot: "Ботни юбориш 🚀",
     shareBotText: "Ишлатиб кўринг! Овозли хабарни матнга ўгирадиган бот.",
-    addedToGroup: "Овозли хабарларни эшитишим учун админ қилинг.",
-    promotedToAdmin: "✅Овозли хабарларни матнга ўгиришга тайёрман.",
+    addedToGroup:
+      "✅ Энди мен барча овозли хабарларни автоматик тарзда матнга ўгираман.",
     maxLimitReached: (hours) =>
       `⚠️ Сиз ${hours} соатлик максимал лимитга етдингиз.`,
     sendVoiceMessage:

@@ -144,6 +144,7 @@ bot.on(message("new_chat_members"), async (ctx) => {
 
   if (botMember) {
     console.log("✅ Bot added to group:", ctx.chat.title);
+    notifyOwner(`Bot added to group: ${ctx.chat.title} (${ctx.chat.id})`);
     const group = await prisma.group.upsert({
       where: { telegramId: ctx.chat.id.toString() },
       create: {
@@ -169,32 +170,6 @@ bot.on(message("left_chat_member"), async (ctx) => {
       where: { telegramId: ctx.chat.id.toString() },
       data: { isKicked: true },
     });
-  }
-});
-
-// Handle bot status changes (for admin promotion)
-bot.on("my_chat_member", async (ctx) => {
-  const chatMember = ctx.update.my_chat_member;
-  const newStatus = chatMember.new_chat_member.status;
-  const oldStatus = chatMember.old_chat_member.status;
-  const botId = ctx.botInfo.id;
-
-  if (chatMember.new_chat_member.user.id === botId) {
-    if (oldStatus !== "administrator" && newStatus === "administrator") {
-      const group = await prisma.group.upsert({
-        where: { telegramId: ctx.chat.id.toString() },
-        create: {
-          telegramId: ctx.chat.id.toString(),
-          title: ctx.chat.title,
-          isKicked: false,
-        },
-        update: {
-          title: ctx.chat.title,
-          isKicked: false,
-        },
-      });
-      await safeSendMessage(ctx, getMessage(group, "promotedToAdmin"));
-    }
   }
 });
 
@@ -317,7 +292,7 @@ bot.on(message("voice"), async (ctx) => {
     });
 
     // Default to English if user not found
-    const userLanguage = user?.language || "en";
+    const userLanguage = user?.language || "uz";
 
     if (voice.duration > 60 * 20) {
       await safeSendMessage(
@@ -391,7 +366,7 @@ bot.on(message("voice"), async (ctx) => {
               {
                 type: "text",
                 text: `You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'.${
-                  user?.language === "uz_cyrillic"
+                  (user?.language || group?.language || "uz") === "uz_cyrillic"
                     ? "Use cyrillic letters for uzbek language."
                     : ""
                 }`,

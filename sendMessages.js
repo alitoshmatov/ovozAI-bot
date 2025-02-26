@@ -7,11 +7,11 @@ import { Telegraf } from "telegraf";
 configDotenv();
 
 const message = {
-  uz: "Agar siz ushbu botni foydali deb topsangiz, iltimos, loyihamizni do‘stlaringiz bilan baham ko‘rish orqali qo‘llab-quvvatlang. Qancha ko‘p odam undan foydalansa, biz uni shuncha yaxshi qila olamiz! 🙌 Sizning qo‘llab-quvvatlashingiz biz uchun katta ahamiyatga ega! ❤️",
+  uz: "Meni o'z guruhingizga qo'shing 📢 va men ovozli xabarlarni avtomatik tarzda matnga o'girib beraman ✍️.",
   uz_cyrillic:
-    "Агар сиз ушбу ботни фойдали деб топсангиз, илтимос, лойиҳамизни дўстларингиз билан баҳам кўриш орқали қўллаб-қувватланг. Қанча кўп одам ундан фойдаланса, биз уни шунча яхши қила оламиз! 🙌 Сизнинг қўллаб-қувватлашингиз биз учун катта аҳамиятга эга! ❤️",
-  ru: "Если этот бот оказался для вас полезным, пожалуйста, поддержите наш проект, поделившись им с друзьями. Чем больше людей им пользуются, тем лучше мы сможем его сделать! 🙌 Ваша поддержка очень важна для нас! ❤️",
-  en: "If you find this bot useful, please support our project by sharing it with your friends. The more people use it, the better we can make it! 🙌 Your support means a lot to us! ❤️",
+    "Мени ўз гуруҳингизга қўшинг 📢 ва мен овозли хабарларни автоматик тарзда матнга ўгириб бераман ✍️.",
+  ru: "Добавьте меня в вашу группу 📢, и я автоматически преобразую голосовые сообщения в текст ✍️.",
+  en: "Add me to your group 📢, and I will automatically convert voice messages into text ✍️.",
 };
 
 const libsql = createClient({
