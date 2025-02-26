@@ -2,6 +2,7 @@ export const translations = {
   en: {
     welcome:
       "👋 Hello! Send or forward me a voice message and I will transcribe it for you. You can also use the /language command to change the language." +
+      "\n👥 You can add me to your group and I will transcribe voice messages automatically." +
       "\n\n🔒 Your data will not be stored or used for any purpose.",
     error: "❌ Sorry, there was an error starting the bot. Please try again.",
     limitReached: "⚠️ You have reached the maximum limit of 1 hour.",
@@ -31,6 +32,7 @@ export const translations = {
   ru: {
     welcome:
       "👋 Привет! Отправьте мне голосовое сообщение, и я расшифрую его для вас. Вы также можете использовать команду /language для изменения языка." +
+      "\n👥 Вы можете добавить меня в вашу группу, и я буду транскрибировать голосовые сообщения автоматически." +
       "\n\n🔒 Ваши данные не будут сохранены или использованы для каких-либо целей.",
     error:
       "❌ Извините, произошла ошибка при запуске бота. Пожалуйста, попробуйте снова.",
@@ -68,7 +70,8 @@ export const translations = {
   uz: {
     welcome:
       "👋 Salom! Menga ovozli xabar yuboring va men uni matn ko'rinishida yozib beraman." +
-      "\n\n/language buyrug'ini ishlatib tilni o'zgartirishingiz mumkin." +
+      "\n/language buyrug'ini ishlatib tilni o'zgartirishingiz mumkin." +
+      "\n👥 Meni o'z guruhingizga qo'shing va men ovozli xabarlarni avtomatik tarzda matnga o'giraman." +
       "\n\n🔒 Sizning ma'lumotlaringiz saqlanmaydi va hech qanday maqsadda foydalanilmaydi.",
     error:
       "❌ Kechirasiz, botni ishga tushirishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
@@ -99,7 +102,8 @@ export const translations = {
   uz_cyrillic: {
     welcome:
       "👋 Салом! Менга овозли хабар юборинг ва мен уни матн кўринишида ёзиб бераман." +
-      "\n\n/language буйруғини ишлатиб тилни ўзгартиришингиз мумкин." +
+      "\n/language буйруғини ишлатиб тилни ўзгартиришингиз мумкин." +
+      "\n👥 Мени ўз гуруҳингизга қўшинг ва мен овозли хабарларни автоматик тарзда матнга ўгираман." +
       "\n\n🔒 Сизнинг маълумотларингиз сақланмайди ва ҳеч қандай мақсадда фойдаланилмайди.",
     error:
       "❌ Кечирасиз, ботни ишга туширишда хатолик юз берди. Илтимос, қайта уриниб кўринг.",
