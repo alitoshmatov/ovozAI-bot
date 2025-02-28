@@ -367,25 +367,34 @@ bot.on([message("voice"), message("audio")], async (ctx) => {
       });
       audioData = Buffer.from(response.data);
 
+      const prompt = `You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'.
+                ${
+                  (user?.language || group?.language || "uz") === "uz_cyrillic"
+                    ? "Transcribe Uzbek using Cyrillic script (e.g., 'Ассалому алайкум' instead of 'Assalomu alaykum')."
+                    : ""
+                }
+                Apply line breaks when necessary. For paragraphs, use double line breaks.
+                `;
+
       const transcription = await generateText({
         model: vertex("gemini-2.0-flash"),
         maxRetries: 1,
         messages: [
           {
+            role: "system",
+            content: prompt,
+          },
+          {
             role: "user",
             content: [
               {
                 type: "text",
-                text: `You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'.${
-                  (user?.language || group?.language || "uz") === "uz_cyrillic"
-                    ? "Use cyrillic letters for uzbek language."
-                    : ""
-                }`,
+                text: "Transcribe the audio",
               },
               {
                 type: "file",
                 data: audioData,
-                mimeType: "audio/ogg",
+                mimeType: voice.mime_type,
               },
             ],
           },
@@ -420,7 +429,8 @@ bot.on([message("voice"), message("audio")], async (ctx) => {
         user?._count?.audios !== 0 && (user?._count?.audios + 1) % 5 === 0;
 
       // Divide text into chunks of 4090 characters
-      const chunks = transcription.text.match(new RegExp(".{1,4090}", "g"));
+
+      const chunks = transcription.text.match(new RegExp(".{1,4090}", "gs"));
 
       chunks.forEach(async (chunk) => {
         await safeSendMessage(
