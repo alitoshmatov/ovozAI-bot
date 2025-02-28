@@ -271,13 +271,13 @@ bot.start(async (ctx) => {
   }
 });
 
-bot.on(message("voice"), async (ctx) => {
+bot.on([message("voice"), message("audio")], async (ctx) => {
   try {
     const startTime = Date.now();
     // Show typing status
     await ctx.sendChatAction("typing").catch((e) => {});
-
-    const voice = ctx.message.voice;
+    const voice = ctx.message.voice || ctx.message.audio;
+    const isAudio = !!ctx.message.audio;
     const telegramId = ctx.from.id.toString();
 
     const user = await prisma.user.findUnique({

@@ -29,6 +29,7 @@ export const translations = {
       `⚠️ You have reached the maximum limit of ${hours} hours.`,
     sendVoiceMessage: "Send me a voice message to transcribe it.",
     limitReset: "✅ Monthly limits have been reset. You can use the bot again!",
+    processing: "⏳Processing... Please wait.",
   },
   ru: {
     welcome:
@@ -67,6 +68,7 @@ export const translations = {
     sendVoiceMessage: "Отправьте мне голосовое сообщение для транскрибации.",
     limitReset:
       "✅ Месячные лимиты были сброшены. Вы можете использовать бота снова!",
+    processing: "⏳Обработка... Пожалуйста, подождите.",
   },
   uz: {
     welcome:
@@ -101,6 +103,7 @@ export const translations = {
       "Menga 🎙️ovozli xabarni jo'nating va men uni matnga o'giraman.",
     limitReset:
       "✅ Oylik limit nollashtirildi. Botdan qayta foydalanishingiz mumkin!",
+    processing: "⏳Ovozli xabar yozilmoqda... Kuting.",
   },
   uz_cyrillic: {
     welcome:
@@ -135,5 +138,6 @@ export const translations = {
       "Менга 🎙️овозли хабарни жўнатинг ва мен уни матнга ўгираман.",
     limitReset:
       "✅ Ойлик лимит ноллаштирилди. Ботдан қайта фойдаланишингиз мумкин!",
+    processing: "⏳Овозли хабар ёзилмоқда... Кутинг.",
   },
 };
