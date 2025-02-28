@@ -376,7 +376,11 @@ bot.on(message("voice"), async (ctx) => {
             content: [
               {
                 type: "text",
-                text: `You are a helpful assistant that transcribes voice messages from tajik language, it might have some accents. If voice message is empty say: '_Audio does not contain any speech_'.`,
+                text: `You are a helpful assistant that transcribes voice messages. If voice message is empty say: '_Audio does not contain any speech_'.${
+                  (user?.language || group?.language || "uz") === "uz_cyrillic"
+                    ? "Use cyrillic letters for uzbek language."
+                    : ""
+                }`,
               },
               {
                 type: "file",
