@@ -419,29 +419,34 @@ bot.on(message("voice"), async (ctx) => {
       const shouldShare =
         user?._count?.audios !== 0 && (user?._count?.audios + 1) % 5 === 0;
 
-      await safeSendMessage(
-        ctx,
-        `${transcription.text}
+      // Divide text into chunks of 4090 characters
+      const chunks = transcription.text.match(new RegExp(".{1,4090}", "g"));
+
+      chunks.forEach(async (chunk) => {
+        await safeSendMessage(
+          ctx,
+          `${chunk}
 ${
   shouldShare
     ? `\n<blockquote>${translations[userLanguage].shareToSupport}</blockquote>`
     : ""
 }`,
-        {
-          parse_mode: "HTML",
-          reply_to_message_id: ctx.message.message_id,
-          reply_markup: shouldShare
-            ? Markup.inlineKeyboard([
-                [
-                  Markup.button.url(
-                    translations[userLanguage].shareBot,
-                    `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=${user.telegramId}&text=\n\n${translations[userLanguage].shareBotText}`
-                  ),
-                ],
-              ]).reply_markup
-            : null,
-        }
-      );
+          {
+            parse_mode: "HTML",
+            reply_to_message_id: ctx.message.message_id,
+            reply_markup: shouldShare
+              ? Markup.inlineKeyboard([
+                  [
+                    Markup.button.url(
+                      translations[userLanguage].shareBot,
+                      `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=${user.telegramId}&text=\n\n${translations[userLanguage].shareBotText}`
+                    ),
+                  ],
+                ]).reply_markup
+              : null,
+          }
+        );
+      });
     } catch (error) {
       const requestDuration = (Date.now() - startTime) / 1000;
 
