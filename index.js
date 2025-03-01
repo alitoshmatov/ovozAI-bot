@@ -425,14 +425,17 @@ bot.on([message("voice"), message("audio")], async (ctx) => {
             }),
       ]).then(() => {});
 
-      const shouldShare =
-        user?._count?.audios !== 0 && (user?._count?.audios + 1) % 5 === 0;
-
       // Divide text into chunks of 4090 characters
 
       const chunks = transcription.text.match(new RegExp(".{1,4090}", "gs"));
 
-      chunks.forEach(async (chunk) => {
+      chunks.forEach(async (chunk, index) => {
+        const shouldShare =
+          user?._count?.audios !== 0 &&
+          (user?._count?.audios + 1) % 5 === 0 &&
+          index === chunks.length - 1 &&
+          chunk.length < 4000;
+
         await safeSendMessage(
           ctx,
           `${chunk}

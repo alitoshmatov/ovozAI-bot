@@ -7,11 +7,11 @@ import { Telegraf } from "telegraf";
 configDotenv();
 
 const message = {
-  uz: "Meni o'z guruhingizga qo'shing 📢 va men ovozli xabarlarni avtomatik tarzda matnga o'girib beraman ✍️.",
+  uz: "Endi 20 daqiqagacha bo'lgan audio fayllarni ham matnga o'girishingiz mumkin.",
   uz_cyrillic:
-    "Мени ўз гуруҳингизга қўшинг 📢 ва мен овозли хабарларни автоматик тарзда матнга ўгириб бераман ✍️.",
-  ru: "Добавьте меня в вашу группу 📢, и я автоматически преобразую голосовые сообщения в текст ✍️.",
-  en: "Add me to your group 📢, and I will automatically convert voice messages into text ✍️.",
+    "Энди 20 дақиқагача бўлган аудио файлларни ҳам матнга ўгиришингиз мумкин.",
+  ru: "Теперь вы можете преобразовать аудиофайлы длиной до 20 минут в текст.",
+  en: "Now you can convert audio files up to 20 minutes long to text.",
 };
 
 const libsql = createClient({
