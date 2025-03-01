@@ -15,7 +15,8 @@ export const translations = {
     },
     error: "❌ Sorry, there was an error transcribing the voice message.",
     emptyMessage: "Audio does not contain any speech",
-    fileTooLarge: "⚠️ The file is too large. Please send a shorter message.",
+    fileTooLarge:
+      "⚠️ The file is too large. Please send a shorter file. The max audio should be 20 minutes long or 20mb in size.",
     cyrillicEnabled: "✅ Now I will use cyrillic letters for uzbek text",
     latinEnabled: "✅ Now I will use latin letters for uzbek text",
     fixedProblems:
@@ -50,7 +51,7 @@ export const translations = {
       "❌ Извините, произошла ошибка при расшифровке голосового сообщения.",
     emptyMessage: "Голосовое сообщение не содержит речи",
     fileTooLarge:
-      "⚠️ Файл слишком большой. Пожалуйста, отправьте более короткое сообщение.",
+      "⚠️ Файл слишком большой. Пожалуйста, отправьте более короткий файл. Максимальная длительность аудио 20 минут или 20mb в размере. ",
     cyrillicEnabled:
       "✅ Теперь я буду использовать кириллицу для текста на узбекском.",
     latinEnabled:
@@ -88,7 +89,8 @@ export const translations = {
     },
     error: "❌ Xatolik yuz berdi. Ovozli xabarni o'qib bo'lmadi.",
     emptyMessage: "Ovozli xabarda so'zlashuv topilmadi",
-    fileTooLarge: "⚠️ Fayl juda katta. Qisqa xabarni yuboring.",
+    fileTooLarge:
+      "⚠️ Fayl juda katta. Qisqa xabarni yuboring. Audio 20 minut yoki 20MBgacha bo'lishi mumkin.",
     fixedProblems:
       "Oldinroq ko'zatilgan xatoliklar bartaraf etildi 🎙️. Bot yana to'liq ish holatiga qaytdi ✅. Qayta foydalanishingiz mumkin!",
     shareToSupport:
@@ -123,7 +125,8 @@ export const translations = {
     },
     error: "❌ Хатолик юз берди. Овозли хабарни ўқиб бўлмади.",
     emptyMessage: "Овозли хабарда сўзлашув топилмади",
-    fileTooLarge: "⚠️ Файл жуда катта. Қисқа хабарни юборинг.",
+    fileTooLarge:
+      "⚠️ Файл жуда катта. Қисқа хабарни юборинг. Аудио 20 минут yoki 20MBгача бўлиши керак.",
 
     fixedProblems:
       "Олдинроқ кўзатилган хатоликлар бартараф этилди 🎙️. Бот яна тўлиқ иш ҳолатига қайтди ✅. Қайта фойдаланишингиз мумкин!",
