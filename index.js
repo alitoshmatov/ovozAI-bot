@@ -304,7 +304,7 @@ bot.on([message("voice"), message("audio")], async (ctx) => {
 
     // Default to English if user not found
     const userLanguage = user?.language || "uz";
-    console.log(voice);
+
     if (voice.duration > 60 * 20 || voice.file_size > 20 * 1024 * 1024) {
       await safeSendMessage(
         ctx,
