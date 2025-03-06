@@ -43,7 +43,7 @@ process.on("unhandledRejection", (reason, promise) => {
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
 bot.use(async (ctx, next) => {
-  if (ctx.message.text === "/start") {
+  if (ctx.message?.text === "/start") {
     return next();
   }
   if (!isGroup(ctx)) {
