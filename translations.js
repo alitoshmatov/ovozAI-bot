@@ -31,6 +31,7 @@ export const translations = {
     sendVoiceMessage: "Send me a voice message to transcribe it.",
     limitReset: "✅ Monthly limits have been reset. You can use the bot again!",
     processing: "⏳Processing... Please wait.",
+    pleaseStartBot: "Please start the bot first using /start command",
   },
   ru: {
     welcome:
@@ -70,6 +71,7 @@ export const translations = {
     limitReset:
       "✅ Месячные лимиты были сброшены. Вы можете использовать бота снова!",
     processing: "⏳Обработка... Пожалуйста, подождите.",
+    pleaseStartBot: "Пожалуйста, сначала используйте команду /start",
   },
   uz: {
     welcome:
@@ -106,6 +108,8 @@ export const translations = {
     limitReset:
       "✅ Oylik limit nollashtirildi. Botdan qayta foydalanishingiz mumkin!",
     processing: "⏳Ovozli xabar yozilmoqda... Kuting.",
+    pleaseStartBot:
+      "Iltimos, botni ishga tushirish uchun birinchi /start buyrug'ini bosing.",
   },
   uz_cyrillic: {
     welcome:
@@ -142,5 +146,7 @@ export const translations = {
     limitReset:
       "✅ Ойлик лимит ноллаштирилди. Ботдан қайта фойдаланишингиз мумкин!",
     processing: "⏳Овозли хабар ёзилмоқда... Кутинг.",
+    pleaseStartBot:
+      "Илтимос, ботни ишга тушириш uchun биринчи /start буйруғини босинг.",
   },
 };

@@ -42,6 +42,22 @@ process.on("unhandledRejection", (reason, promise) => {
 
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
+bot.use(async (ctx, next) => {
+  if (ctx.message.text === "/start") {
+    return next();
+  }
+  if (!isGroup(ctx)) {
+    const user = await prisma.user.findUnique({
+      where: { telegramId: ctx.from.id.toString() },
+    });
+    if (!user) {
+      await safeSendMessage(ctx, getMessage(user, "pleaseStartBot"));
+      return;
+    }
+  }
+  next();
+});
+
 // bot.use(async (ctx, next) => {
 //   try {
 //     console.log(ctx.update);
