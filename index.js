@@ -618,6 +618,15 @@ const getSummary = async () => {
       },
     });
 
+    const dailyActiveUsers = await prisma.user.count({
+      where: {
+        updatedAt: {
+          gte: yesterday,
+          lt: today,
+        },
+      },
+    });
+
     // Format the duration in minutes and seconds
     const totalAudioMinutes = Math.floor((audioStats._sum.duration || 0) / 60);
     const totalAudioSeconds = (audioStats._sum.duration || 0) % 60;
@@ -627,7 +636,8 @@ const getSummary = async () => {
       `📅 Date: ${yesterday.toLocaleDateString()}\n` +
       `👥 New Users: ${newUsers}\n` +
       `🎤 Total Transcriptions: ${audioStats._count.id}\n` +
-      `⏱ Total Audio Length: ${totalAudioMinutes}m ${totalAudioSeconds}s`;
+      `⏱ Total Audio Length: ${totalAudioMinutes}m ${totalAudioSeconds}s\n` +
+      `👥 Daily Active Users: ${dailyActiveUsers}`;
 
     notifyOwner(summaryMessage);
   } catch (error) {
