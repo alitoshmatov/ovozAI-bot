@@ -358,16 +358,20 @@ bot.on([message("voice"), message("audio")], async (ctx) => {
         });
       } else {
         if (group.totalAudioSeconds > 60 * 60 * 2) {
-          await safeSendMessage(
-            ctx,
-            translations[group.language || "en"].maxLimitReached(2),
-            {
-              disable_notification: true,
-            }
-          );
-          notifyOwner(
-            `Group [${group.title}](tg://user?id=${group.telegramId}) reached the limit of 2 hour. Total audio seconds: ${group.totalAudioSeconds}`
-          );
+          // Send message once out of 5 chance
+          const random = Math.random() * 5;
+          if (random === 1) {
+            await safeSendMessage(
+              ctx,
+              translations[group.language || "en"].maxLimitReached(2),
+              {
+                disable_notification: true,
+              }
+            );
+            notifyOwner(
+              `Group [${group.title}](tg://user?id=${group.telegramId}) reached the limit of 2 hour. Total audio seconds: ${group.totalAudioSeconds}`
+            );
+          }
           return;
         }
       }
